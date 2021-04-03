@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
+<style>
+
+
+body {
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    padding: 40px;
+    background-color: #006994;
+}
+h1{
+  font-size: 3em;
+  font-weight: 700;
+  color: #f8f8ff;
+}
+a{
+  color: #333399;
+}
+a:hover{
+  color: #FF0099;
+}
+
+.states {
+    stroke: #fff;
+    stroke-width:1px;
+}
+.states:hover{
+  opacity: .6;
+}
+
+.legendLinear text {
+    font-size: 12px;
+}
+.d3-tip {
+  line-height: 1;
+  padding: 12px;
+  background: rgba(43,43,43, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+</style>
+<body>
+
+    <h1>US Natural Disaster Declarations</h1>
+
+    <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
+
+    <div id="vis"></div>
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="//d3js.org/queue.v1.min.js"></script>
+<script src="d3-legend.min.js"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+<script>
+
+name_to_abbr = {
+        Arizona: "AZ",
+        Alabama: "AL",
+        Alaska: "AK",
+        Arkansas: "AR",
+        California: "CA",
+        Colorado: "CO",
+        Connecticut: "CT",
+        Delaware: "DE",
+        Florida: "FL",
+        Georgia: "GA",
+        Hawaii: "HI",
+        Idaho: "ID",
+        Illinois: "IL",
+        Indiana: "IN",
+        Iowa: "IA",
+        Kansas: "KS",
+        Kentucky: "KY",
+        Louisiana: "LA",
+        Maine: "ME",
+        Maryland: "MD",
+        Massachusetts: "MA",
+        Michigan: "MI",
+        Minnesota: "MN",
+        Mississippi: "MS",
+        Missouri: "MO",
+        Montana: "MT",
+        Nebraska: "NE",
+        Nevada: "NV",
+        "New Hampshire": "NH",
+        "New Jersey": "NJ",
+        "New Mexico": "NM",
+        "New York": "NY",
+        "North Carolina": "NC",
+        "North Dakota": "ND",
+        Ohio: "OH",
+        Oklahoma: "OK",
+        Oregon: "OR",
+        Pennsylvania: "PA",
+        "Rhode Island": "RI",
+        "South Carolina": "SC",
+        "South Dakota": "SD",
+        Tennessee: "TN",
+        Texas: "TX",
+        Utah: "UT",
+        Vermont: "VT",
+        Virginia: "VA",
+        Washington: "WA",
+        "West Virginia": "WV",
+        Wisconsin: "WI",
+        Wyoming: "WY",
+      };
+
+var width = 900;
+    height = 700;
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-5, 0])
+  .html(function(d) {
+    var dataRow = countryById[name_to_abbr[d.properties.name]];
+       if (dataRow) {
+           return d.properties.name + ": " + dataRow;
+       } else {
+           return d.properties.name + ": No data.";
+       }
+  })
+
+
+var svg = d3.select('#vis').append('svg')
+    .attr('width', width)
+    .attr('height', height);
+
+svg.call(tip);
+
+var projection = d3.geo.albersUsa()
+    .scale(900) // mess with this if you want
+    .translate([width / 2, height / 2]);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+var colorScale = d3.scale.linear().range(["#fff7ec", "#7f0000"]).interpolate(d3.interpolateLab);
+
+var countryById = d3.map();
+
+// we use queue because we have 2 data files to load.
+queue()
+    .defer(d3.json, "us.json")
+    .defer(d3.csv, "us_disaster_declarations.csv") // process
+    .await(loaded);
+
+function getColor(d) {
+    var dataRow = countryById[name_to_abbr[d.properties.name]];
+       if (dataRow) {
+           return colorScale(dataRow);
+       } else {
+        return "#ccc";
+       }
+}
+
+
+function loaded(error, usa, mortality) {
+
+    console.log(usa);
+    console.log(mortality);
+
+    statesCount = {};
+    mortality.forEach(d => {
+      if (!(d.state in countryById)) {
+        countryById[d.state] = 0;
+        statesCount[d.state] = 0;
+      }
+      countryById[d.state] += 1;
+      statesCount[d.state] += 1;
+    });
+
+    let lst = [];
+    for (const [key, value] of Object.entries(statesCount)) {
+      let newObj = {};
+      newObj["key"] = value;
+      lst.push(newObj);
+    }
+
+    colorScale.domain(d3.extent(lst, function(d) {return d.key;}));
+
+    var states = topojson.feature(usa, usa.objects.states).features;
+
+    svg.selectAll('path.states')
+        .data(states)
+        .enter()
+        .append('path')
+        .attr('class', 'states')
+        .attr('d', path)
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide)
+        .attr('fill', function(d,i) {
+            //console.log(d.properties.name);
+            return getColor(d);
+        })
+        .append("title");
+
+    var linear = colorScale;
+
+    svg.append("g")
+      .attr("class", "legendLinear")
+      .attr("transform", "translate(20,20)");
+
+    var legendLinear = d3.legend.color()
+      .shapeWidth(50)
+      .orient('horizontal')
+      .scale(linear);
+
+    svg.select(".legendLinear")
+      .call(legendLinear);
+
+}
+
+</script>
+</body>
+</html>
