@@ -45,9 +45,9 @@ a:hover{
 <body>
 
     <h1>US Natural Disaster Declarations</h1>
-
+    <h3>Year: 2015</h3>
     <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
-
+    
     <div id="vis"></div>
 
 <script src="//d3js.org/d3.v3.min.js"></script>
@@ -148,6 +148,8 @@ var countryById = d3.map();
 queue()
     .defer(d3.json, "us.json")
     .defer(d3.csv, "us_disaster_declarations.csv") // process
+    .defer(d3.csv, "us_cities.csv") // https://simplemaps.com/data/us-cities
+    .defer(d3.csv, "us_state_latlong.csv") //https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
     .await(loaded);
 
 function getColor(d) {
@@ -160,11 +162,11 @@ function getColor(d) {
 }
 
 
-function loaded(error, usa, mortality) {
+function loaded(error, usa, mortality, usa_cities, us_states) {
 
-    console.log(usa);
-    console.log(mortality);
-
+    // console.log(usa);
+    // console.log(mortality);
+    // console.log(usa_cities)
     statesCount = {};
     mortality.forEach(d => {
       if (!(d.state in countryById)) {
@@ -175,6 +177,18 @@ function loaded(error, usa, mortality) {
       statesCount[d.state] += 1;
     });
 
+    locMap = {} // key (county, city, or state): value (longitude, latitude)
+    usa_cities.forEach(c => {
+      locMap[c.county_name + " (County)"] = [c.lng, c.lat]
+      locMap[c.city] = [c.lng, c.lat]
+    });
+
+    us_states.forEach(s => {
+      locMap[s.State] = [s.Longitude, s.Latitude]
+    })
+    
+    
+    // console.log(countyMap)
     let lst = [];
     for (const [key, value] of Object.entries(statesCount)) {
       let newObj = {};
@@ -213,7 +227,32 @@ function loaded(error, usa, mortality) {
 
     svg.select(".legendLinear")
       .call(legendLinear);
-
+    
+    // mapping mortalities for a single year
+    mortalityWithValidLoc = mortality.filter(m => m.state in locMap && m.fy_declared === "2015")
+    svg.selectAll("circle")
+      .data(mortalityWithValidLoc)
+      .enter()
+      .append("circle")
+      .attr("cx", function(d) {
+        if (d.designated_area in locMap){
+          return projection(locMap[d.designated_area])[0];
+        } else {
+          return projection(locMap[d.state])[0];
+        }
+      })
+      .attr("cy", function(d) {
+        if (d.designated_area in locMap) {
+          return projection(locMap[d.designated_area])[1];
+        } else {
+          return projection(locMap[d.state])[1];
+        }
+      })
+      .attr("r", function(d) {
+        return 2
+      })		
+      .style("fill", "rgb(217,91,67)")	
+		  .style("opacity", 0.85)	
 }
 
 </script>
