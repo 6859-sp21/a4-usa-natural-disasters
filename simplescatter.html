@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="style.css">
+
 <style>
-
-
 body {
     font-family: "Open Sans", sans-serif;
     font-size: 16px;
     padding: 40px;
-    background-color: #006994;
 }
 h1{
   font-size: 3em;
@@ -16,7 +15,7 @@ h1{
   color: #f8f8ff;
 }
 a{
-  color: #333399;
+  color: #fff;
 }
 a:hover{
   color: #FF0099;
@@ -40,8 +39,8 @@ a:hover{
   color: #fff;
   border-radius: 2px;
 }
-
 </style>
+
 <body>
 
     <h1>US Natural Disaster Declarations</h1>
@@ -50,9 +49,15 @@ a:hover{
 
     <div id="vis"></div>
 
+    <!-- Slider Timeline -->
+    <div id="slider6" class="d3-slider d3-slider-horizontal"></div>
+
+   
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script src="//d3js.org/queue.v1.min.js"></script>
 <script src="d3-legend.min.js"></script>
+<script src="d3.v3.min.js"></script>
+<script src="d3.slider.min.js"></script>
 <script src="//d3js.org/topojson.v1.min.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
@@ -213,8 +218,8 @@ function loaded(error, usa, mortality) {
 
     svg.select(".legendLinear")
       .call(legendLinear);
-
 }
+d3.select('#slider6').call(d3.slider().axis(true).min(1953).max(2021).step(10));
 
 </script>
 </body>
