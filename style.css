@@ -6,8 +6,23 @@ h1 {
   text-align: center;
   color: #f8f8ff;
 }
+
+h2 {
+  text-align: center;
+  color: #f8f8ff;
+}
+
 p, text{
+  text-align: center;
   color:#fff;
+}
+
+.legendLinear text.label {
+  fill: #fff;
+}
+
+.tick {
+  fill: #fff;
 }
 
 /* Timeline Slider Feature Styles */
