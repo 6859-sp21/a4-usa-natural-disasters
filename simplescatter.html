@@ -48,7 +48,17 @@ a:hover{
     <h1>US Natural Disaster Declarations</h1>
     <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
     <h2>Year: 2015</h2>
-
+    <div class="checkbox-filters">
+      <h4>Choose your disasters:</h4>
+      <div class="checkboxes">
+        <div id="water"><h3>Water</h3></div>
+        <div id="earth"><h3>Earth</h3></div>
+        <div id="fire"><h3>Fire</h3></div>
+        <div id="wind"><h3>Wind</h3></div>
+        <div id="other"><h3>Other</h3></div>
+      </div>
+    </div>
+    <br>
     <div id="vis"></div>
 
     <!-- Slider Timeline -->
@@ -116,7 +126,65 @@ name_to_abbr = {
         "West Virginia": "WV",
         Wisconsin: "WI",
         Wyoming: "WY",
-      };
+};
+
+incident_type_to_generic_type = {
+  "Coastal Storm": "water",
+  Hurricane: "water",
+  Flood: "water",
+  Tornado: "water",
+  "Severe Ice Storm": "water",
+  "Severe Storm": "water",
+  "Severe Storm(s)": "water",
+  Snow: "water",
+  Tsunami: "water",
+  Typhoon: "water",
+  Drought: "earth",
+  Earthquake: "earth",
+  Freezing: "earth",
+  "Mud/Landslide": "earth",
+  Volcano: "earth",
+  Fire: "fire",
+  Biological: "other",
+  Chemical: "other",
+  "Dam/Levee Break": "other",
+  "Fishing Losses": "other",
+  "Human Cause": "other",
+  Other: "other",
+  Terrorist: "other",
+  "Toxic Substances": "other",
+}
+
+incident_to_color = {
+  water: "rgb(0,0,136)",
+  earth: "rgb(0,136,0)",
+  wind: "rgb(100,100,0)",
+  fire: "rgb(136,0,0)",
+  other: "rgb(128,128,128)"
+}
+
+// adding the filter by incident checkboxes
+Object.entries(incident_type_to_generic_type).forEach(item => {
+  let incident = item[0]
+  let generic_type = item[1]
+  var checkboxes = document.getElementById(generic_type)
+  var checkbox = document.createElement('input');
+  checkbox.type = "checkbox";
+  checkbox.name = incident;
+  checkbox.value = incident;
+  checkbox.id = incident;
+
+  var label = document.createElement('label')
+  label.htmlFor = incident;
+  label.appendChild(document.createTextNode(incident));
+  
+  var br = document.createElement('br')
+
+  checkboxes.appendChild(checkbox);
+  checkboxes.appendChild(label);
+  checkboxes.appendChild(br);
+})
+
 
 var width = 900;
     height = 700;
@@ -256,10 +324,12 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
         }
       })
       .attr("r", function(d) {
-        return 2
+        return 4
       })		
-      .style("fill", "rgb(217,91,67)")	
-      .style("opacity", 0.85)	
+      .style("fill", function(d) {
+        return incident_to_color[incident_type_to_generic_type[d.incident_type]]
+      })	
+      .style("opacity", 0.5)	
 }
 d3.select('#slider6').call(d3.slider().axis(true).min(1953).max(2021).step(1));
 

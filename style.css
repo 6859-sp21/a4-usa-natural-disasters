@@ -2,13 +2,12 @@ body {
   background-color: #04091E;
 }
 
-h1 {
+h1, h2 {
   text-align: center;
   color: #f8f8ff;
 }
 
-h2 {
-  text-align: center;
+h4 {
   color: #f8f8ff;
 }
 
@@ -23,6 +22,23 @@ p, text{
 
 .tick {
   fill: #fff;
+}
+
+.checkboxes {
+  display: flex;
+  color: #fff;
+}
+
+.checkbox-filters {
+  border-style: double;
+  color: #fff;
+  border-radius: 5px;
+  padding: 2px 5px 2px 5px;
+
+}
+
+.checkboxes > * {
+  flex: 1 1 0;
 }
 
 /* Timeline Slider Feature Styles */
