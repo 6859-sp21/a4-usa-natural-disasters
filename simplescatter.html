@@ -46,10 +46,9 @@ a:hover{
 <body>
 
     <h1>US Natural Disaster Declarations</h1>
-    <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
     <h2>Year: 2015</h2>
     <div class="checkbox-filters">
-      <h4>Choose your disasters:</h4>
+      <h4>Select the disaster type:</h4>
       <div class="checkboxes">
         <div id="water"><h3>Water</h3></div>
         <div id="earth"><h3>Earth</h3></div>
@@ -62,7 +61,8 @@ a:hover{
     <div id="vis"></div>
 
     <!-- Slider Timeline -->
-    <div id="slider6" class="d3-slider d3-slider-horizontal"></div>
+    <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
+    <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
 
    
 <script src="//d3js.org/d3.v3.min.js"></script>
@@ -187,8 +187,8 @@ Object.entries(incident_type_to_generic_type).forEach(item => {
 })
 
 
-var width = 900;
-    height = 700;
+var width = 1200;
+    height = 800;
 
 var tip = d3.tip()
   .attr('class', 'd3-tip')
@@ -210,7 +210,7 @@ var svg = d3.select('#vis').append('svg')
 svg.call(tip);
 
 var projection = d3.geo.albersUsa()
-    .scale(1200) // mess with this if you want
+    .scale(1300) // mess with this if you want
     .translate([width / 2, height / 2]);
 
 var path = d3.geo.path()
@@ -325,7 +325,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
 
     svg.select(".legendLinear")
       .call(legendLinear);
-    
+
     // mapping mortalities for a single year
     mortalityWithValidLoc = mortality.filter(m => m.state in locMap && m.fy_declared === "2015")
     svg.selectAll("circle")

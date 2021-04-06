@@ -12,8 +12,9 @@ h4 {
 }
 
 p, text{
-  text-align: center;
+  text-align: left;
   color:#fff;
+  padding: 50px 30px 30px 0px;
 }
 
 .legendLinear text.label {
@@ -113,6 +114,7 @@ p, text{
   margin-bottom: -.6em;      
 }
 
-.tick {
-  color: #f8f8ff;
+svg{
+  display: block;
+  margin: auto;
 }
