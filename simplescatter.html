@@ -49,6 +49,8 @@ a:hover{
 }
 </style>
 
+<head><title>US Natural Disaster Declations</title></head>
+
 <body>
 
     <h1>US Natural Disaster Declarations</h1>
@@ -56,11 +58,26 @@ a:hover{
     <div class="checkbox-filters">
       <h4>Select the disaster type:</h4>
       <div class="checkboxes">
-        <div id="water"><h3>Water</h3></div>
-        <div id="earth"><h3>Earth</h3></div>
-        <div id="fire"><h3>Fire</h3></div>
-        <div id="wind"><h3>Wind</h3></div>
-        <div id="other"><h3>Other</h3></div>
+        <div id="water">
+          <input type="checkbox" name="water" value="water" id="checkbox" checked>
+          <label for="water">Water</label>
+        </div>
+        <div id="earth">
+          <input type="checkbox" name="earth" value="earth" id="checkbox" checked>
+          <label for="earth">Earth</label>
+        </div>
+        <div id="fire">
+          <input type="checkbox" name="fire" value="fire" id="checkbox" checked>
+          <label for="fire">Fire</label>
+        </div>
+        <div id="wind">
+          <input type="checkbox" name="wind" value="wind" id="checkbox" checked>
+          <label for="wind">Wind</label>
+        </div>
+        <div id="other">
+          <input type="checkbox" name="other" value="other" id="checkbox" checked>
+          <label for="other">Other</label>
+        </div>
       </div>
     </div>
     <br>
@@ -171,6 +188,7 @@ incident_to_color = {
 }
 
 // adding the filter by incident checkboxes
+/*
 Object.entries(incident_type_to_generic_type).forEach(item => {
   let incidentWithSpaces = item[0];
   let incident = removeSpaceAndPunc(item[0]);
@@ -192,7 +210,7 @@ Object.entries(incident_type_to_generic_type).forEach(item => {
   checkboxes.appendChild(label);
   checkboxes.appendChild(br);
 })
-
+*/
 
 var width = 1200;
     height = 800;
@@ -334,13 +352,13 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       .call(legendLinear);
 
     // mapping mortalities for a single year
-    mortalityWithValidLoc = mortality.filter(m => m.state in locMap && m.fy_declared === "2015")
+    mortalityWithValidLoc = mortality.filter(m => m.state in locMap && m.fy_declared === "2018")
     
     svg.selectAll("circle")
       .data(mortalityWithValidLoc)
       .enter()
       .append("circle")
-      .attr("id", function (d) { return removeSpaceAndPunc(d.incident_type)})
+      .attr("id", function (d) { return incident_type_to_generic_type[d.incident_type]})
       .attr("cx", function(d) {
         if (d.designated_area in locMap){
           return projection(locMap[d.designated_area])[0];
@@ -367,7 +385,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     d3.selectAll("#checkbox").on("change", update);
 
     // And initialize it at the beginning
-    update()
+    update();
 }
 
 //
