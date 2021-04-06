@@ -5,17 +5,29 @@ body {
 h1, h2 {
   text-align: center;
   color: #f8f8ff;
+  font-family: Georgia,Cambria,"Times New Roman",Times,serif;
+  font-style: normal; 
+  font-variant: normal; 
+  font-weight: 400;
+  line-height: 26.4px;
 }
 
 h4 {
   color: #f8f8ff;
 }
 
-p, text{
+p{
+  font-family: Georgia,Cambria,"Times New Roman",Times,serif;
+  font-size: 14px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
   text-align: left;
+  line-height: 20px; 
   color:#fff;
   padding: 50px 30px 30px 0px;
 }
+      
 
 .legendLinear text.label {
   fill: #fff;
@@ -102,10 +114,12 @@ p, text{
   fill: none;
   stroke: #aaa;
   shape-rendering: crispEdges;
+  display: flex;
 }
 
 .d3-slider-axis text {
   font-size: 11px;
+  display: flex;
 }
 
 .d3-slider-vertical .d3-slider-handle {
@@ -116,5 +130,11 @@ p, text{
 
 svg{
   display: block;
+  margin: auto;
+}
+
+#slider6{
+  display: flex;
+  width: 880px;
   margin: auto;
 }
