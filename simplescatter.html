@@ -41,6 +41,12 @@ a:hover{
   color: #fff;
   border-radius: 2px;
 }
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
 </style>
 
 <body>
@@ -64,6 +70,7 @@ a:hover{
     <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
     <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
 
+    <div id="timeline-container"></div>
    
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script src="//d3js.org/queue.v1.min.js"></script>
@@ -299,18 +306,18 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     var states = topojson.feature(usa, usa.objects.states).features;
 
     svg.selectAll('path.states')
-        .data(states)
-        .enter()
-        .append('path')
-        .attr('class', 'states')
-        .attr('d', path)
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide)
-        .attr('fill', function(d,i) {
-            //console.log(d.properties.name);
-            return getColor(d);
-        })
-        .append("title");
+      .data(states)
+      .enter()
+      .append('path')
+      .attr('class', 'states')
+      .attr('d', path)
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+      .attr('fill', function(d,i) {
+          //console.log(d.properties.name);
+          return getColor(d);
+      })
+      .append("title");
 
     var linear = colorScale;
 
@@ -328,6 +335,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
 
     // mapping mortalities for a single year
     mortalityWithValidLoc = mortality.filter(m => m.state in locMap && m.fy_declared === "2015")
+    
     svg.selectAll("circle")
       .data(mortalityWithValidLoc)
       .enter()
@@ -362,7 +370,179 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     update()
 }
 
-d3.select('#slider6').call(d3.slider().axis(true).min(1953).max(2021).step(1));
+//
+//
+//MY WORK STARTS HEREEEEE MY MY WORK STARTS HEREEEEE MY WORK STARTS HEREEEEEWORK STARTS HEREEEEE
+//
+// Loads US Natural disaster data.
+function getDisasterData() {
+  d3.csv("us_disaster_declarations.csv", function(error, dataForMap) {
+      if (error) return console.error(error);
+
+      var parseYearMonthDay = d3.time.format("%Y/%m/%d").parse;
+      var dataForTimeline = [],
+          dateToDisasterCount = {};
+
+      dataForMap.forEach(function(d, idx) {
+          d.TIME = parseMonthDayYear(d.TIME);
+          d.TOT = +d.TOT;
+          // d.latitude = +d.latitude;
+          // d.longitude = +d.longitude;
+          // colorScale(d.CR);
+
+          if (!dateToDisasterCount[d.TIME]) {
+            dateToDisasterCount[d.TIME] = d.TOT;
+        } else {
+            dateToDisasterCount[d.TIME] += d.TOT;
+        }
+      });
+      Object.keys(dateToDisasterCount).forEach(function(time) {
+          dataForTimeline.push({ TIME: new Date(time), TOT: dateToDisasterCount[time] });
+      });
+      dataForTimeline.sort(function(a,b) { return a.TIME - b.TIME; });
+
+      radiusScale.domain(d3.extent(dataForMap, function(crime) { return +crime.TOT; }));
+
+      makeTimeline(dataForMap, dataForTimeline);
+      
+  })
+}
+// Creates the event timeline and sets up callbacks for brush changes
+function makeTimeline(dataForMap, dataForTimeline) {
+  var margin = { top: 10, right: 10, bottom: 20, left: 25 },
+      width  = mapWidth - margin.left - margin.right,
+      height = 80 - margin.top  - margin.bottom;
+
+  var timelineSvg = d3.select("#timeline-container").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
+
+  var timeline = timelineSvg.append("g")
+      .attr("class", "timeline")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var x = d3.time.scale()
+      .domain(d3.extent(dataForTimeline.map(function(d) { return d.TIME; })))
+      .range([0, width]);
+
+  var y = d3.scale.linear()
+      .domain(d3.extent(dataForTimeline.map(function(d) { return d.TOT; })))
+      .range([height, 0]);
+
+  var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+
+  // var yAxis = d3.svg.axis()
+  //     .scale(y)
+  //     .orient("left")
+  //     .ticks(2);
+
+  var area = d3.svg.area()
+      .interpolate("linear")
+      .x(function(d) { return x(d.TIME); })
+      .y0(height)
+      .y1(function(d) { return y(d.TOT); });
+
+  timeline.append("path")
+      .datum(dataForTimeline)
+      .attr("class", "area")
+      .attr("d", area);
+
+  timeline.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  // timeline.append("g")
+  //     .attr("class", "y axis")
+  //     .call(yAxis);
+
+  // timeline.append("text")
+  //     .attr("transform", "rotate(-90)")
+  //     .attr("dy", "1em")
+  //     .style("text-anchor", "end")
+  //     .text("# Crimes");
+
+  // Add brush to timeline, hook up to callback
+  var brush = d3.svg.brush()
+      .x(x)
+      .on("brush", function() { brushCallback(brush, dataForMap); })
+      .extent([new Date("1953"), new Date("2021")]); // initial value
+
+  timeline.append("g")
+      .attr("class", "x brush")
+      .call(brush);
+    // .selectAll("rect")
+    //   .attr("y", -6)
+    //   .attr("height", height + 7);
+
+    brush.event(timeline.select('g.x.brush')); // dispatches a single brush event
+}
+
+  // Called whenever the timeline brush range (extent) is updated
+  // Filters the map data to those points that fall within the selected timeline range
+function brushCallback(brush, dataForMap) {
+  if (brush.empty()) {
+      updateMapPoints([]);
+      updateTitleText();
+  } else {
+      var newDateRange = brush.extent(),
+          filteredData = [];
+
+      dataForMap.forEach(function(d) {
+          if (d.TIME >= newDateRange[0] && d.TIME <= newDateRange[1]) {
+              filteredData.push(d);
+          }
+      });
+      updateMapPoints(filteredData);
+      updateTitleText(newDateRange);
+  }
+}
+
+ // Updates the vis title text to include the passed date array: [start Date, end Date]
+ function updateTitleText(newDateArray) {
+    if (!newDateArray) {
+        title.text("US Natural Disasters (select a year)");
+    } else {
+        var chosenYear = (newDateArray[0].getMonth() + 1) + "/" +
+          (newDateArray[0].getDay() + 1) + "/" +
+          newDateArray[0].getFullYear();
+        title.text("US Natural Disasters in" + chosenYear);
+    }
+  }
+
+// Updates the points displayed on the map, to those in the passed data array
+function updateMapPoints(data) {
+  var circles = mapSvg.selectAll("circle").data(data, function(d) { return d.TIME + d.TOT; });
+
+  circles // update existing points
+    .on("mouseover", tipMouseover)
+    .on("mouseout", tipMouseout)
+    .attr("fill", function(d) { return colorScale(d.CR); })
+    .attr("cx", function(d) { return projection([+d.longitude, +d.latitude])[0]; })
+    .attr("cy", function(d) { return projection([+d.longitude, +d.latitude])[1]; })
+    .attr("r",  function(d) { return radiusScale(+d.TOT); });
+
+  circles.enter().append("circle") // new entering points
+    .on("mouseover", tipMouseover)
+    .on("mouseout", tipMouseout)
+    .attr("fill", function(d) { return colorScale(d.CR); })
+    .attr("cx", function(d) { return projection([+d.longitude, +d.latitude])[0]; })
+    .attr("cy", function(d) { return projection([+d.longitude, +d.latitude])[1]; })
+    .attr("r",  0)
+  .transition()
+    .duration(500)
+    .attr("r",  function(d) { return radiusScale(+d.TOT); });
+
+  circles.exit() // exiting points
+    .attr("r",  function(d) { return radiusScale(+d.TOT); })
+  .transition()
+    .duration(500)
+    .attr("r", 0).remove();
+  }
+
+// d3.select('#slider6').call(d3.slider().axis(true).min(1953).max(2021).step(1));
 
 
 </script>
