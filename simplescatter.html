@@ -235,11 +235,11 @@ var tip = d3.tip()
 
 var svg = d3.select('#vis').append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .call(d3.behavior.zoom().on("zoom", function () {
+    .attr('height', height);
+  /*  .call(d3.behavior.zoom().on("zoom", function () {
     svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
   }))
-  .append("g");
+  .append("g");*/
 
 svg.call(tip);
 
@@ -292,7 +292,9 @@ function update(){
     }
   })
 }
+var g = svg.append("g");
 
+var centered;
 
 function loaded(error, usa, mortality, usa_cities, usa_states) {
 
@@ -319,6 +321,9 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       locMap[s.State] = [s.Longitude, s.Latitude]
     })
     
+    svg.append("g")
+      .attr("class", "legendLinear")
+      .attr("transform", "translate(20,20)");
     
     // console.log(countyMap)
     let lst = [];
@@ -327,12 +332,12 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       newObj["key"] = value;
       lst.push(newObj);
     }
-
+    
     colorScale.domain(d3.extent(lst, function(d) {return d.key;}));
 
     var states = topojson.feature(usa, usa.objects.states).features;
 
-    svg.selectAll('path.states')
+    g.selectAll('path.states')
       .data(states)
       .enter()
       .append('path')
@@ -340,6 +345,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       .attr('d', path)
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide)
+      .on("click", clicked)
       .attr('fill', function(d,i) {
           //console.log(d.properties.name);
           return getColor(d);
@@ -348,9 +354,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
 
     var linear = colorScale;
 
-    svg.append("g")
-      .attr("class", "legendLinear")
-      .attr("transform", "translate(20,20)");
+    
 
     var legendLinear = d3.legend.color()
       .shapeWidth(50)
@@ -363,7 +367,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     // mapping mortalities for a single year
     mortalityWithValidLoc = mortality.filter(m => m.state in locMap && m.fy_declared === "2018")
     
-    svg.selectAll("circle")
+    g.selectAll("circle")
       .data(mortalityWithValidLoc)
       .enter()
       .append("circle")
@@ -396,6 +400,30 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     update();
 
     getDisasterData() // showing the brush timeline
+}
+
+function clicked(d) {
+  var x, y, k;
+  if (d && centered !== d) {
+    var centroid = path.centroid(d);
+    x = centroid[0];
+    y = centroid[1];
+    k = 4;
+    centered = d;
+  } else {
+    x = width / 2;
+    y = height / 2;
+    k = 1;
+    centered = null;
+  }
+
+  g.selectAll("path")
+      .classed("active", centered && function(d) { return d === centered; });
+  
+  g.transition()
+      .duration(0)
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+      .style("stroke-width", 1.5 / k + "px");
 }
 
 //
