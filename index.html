@@ -62,7 +62,6 @@ a:hover{
 
     <h1>US Natural Disaster Declarations</h1>
     <h2>Year: <span id="year-value"></span></h2>
-    <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
     <br>
     <br>
     <div class="checkbox-filters">
@@ -92,7 +91,8 @@ a:hover{
     </div>
     <br>
     <div id="vis"></div>
-    <div id="timeline-container"></div>
+    <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
+    <!-- <div id="timeline-container"></div> -->
     <br><br>
     <!-- Slider Timeline -->
     <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
@@ -398,7 +398,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
 
     var linear = colorScale;
 
-    
+  
 
     var legendLinear = d3.legend.color()
       .shapeWidth(50)
