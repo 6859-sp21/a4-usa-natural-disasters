@@ -445,15 +445,6 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     
 //     svg.select(".quantize").call(legendQuant);
 
-    //previous horizontal legend
-    var legendLinear = d3.legend.color()
-      .shapeWidth(50)
-      .orient('horizontal')
-      .scale(linear);
-
-    svg.select(".legendLinear")
-      .call(legendLinear);
-
     // mapping mortalities for a single year
     setCirclePointsList("1953")    
     g.selectAll("circle")
@@ -493,6 +484,15 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     // And initialize it at the beginning
     update();
 
+    //previous horizontal legend
+    var legendLinear = d3.legend.color()
+      .shapeWidth(50)
+      .orient('horizontal')
+      .scale(linear);
+
+    svg.select(".legendLinear")
+      .call(legendLinear);
+
     getDisasterData() // showing the brush timeline
 }
 
@@ -522,9 +522,7 @@ function clicked(d) {
 
 
 function updateCirclePoints(year) {
-  console.log(circlePointsList)
   setCirclePointsList(year)
-  console.log(circlePointsList)
 
     //Make Selection
     var updateSelection = g.selectAll("circle")
