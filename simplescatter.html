@@ -252,7 +252,6 @@ var circleTip = d3.tip()
   .attr('class', 'd3-tip')
   .offset([-5, 0])
   .html(function(d) {
-    console.log(d)
     return Date(d.declaration_date) + ":<br><br>" + d.declaration_title
             + "<br><br>Click to learn more!";
   })
