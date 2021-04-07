@@ -61,9 +61,10 @@ a:hover{
 <body>
 
     <h1>US Natural Disaster Declarations</h1>
-    <h2>Year: 2015</h2>
-
-    </div>
+    <h2>Year: <span id="year-value"></span></h2>
+    <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
+    <br>
+    <br>
     <div class="checkbox-filters">
       <h4>Select the disaster type:</h4>
       <div class="checkboxes">
@@ -94,7 +95,6 @@ a:hover{
     <div id="timeline-container"></div>
     <br><br>
     <!-- Slider Timeline -->
-    <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
     <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
 
     <!-- MODAL STARTS HERE-->
@@ -457,10 +457,40 @@ function clicked(d) {
       .classed("active", centered && function(d) { return d === centered; });
   
   g.transition()
-      .duration(0)
+      .duration(750)
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
       .style("stroke-width", 1.5 / k + "px");
 }
+
+var myFn = function(slider) {
+  var value = sliderTime.value();
+  d3.select('#year-value').text(value);
+}
+
+// Set slider callback function
+
+var sliderTime = d3.slider().axis(true).min(1953).max(2021).step(1).on('slide', myFn);
+d3.select('#slider6').call(sliderTime);
+d3.select('#year-value').text((sliderTime.value()));
+/*var xAxis = d3.svg.axis()
+    .scale(x)
+	.ticks(20) //specify number of ticks 
+    .orient("bottom");*/
+
+/*
+ var sliderTime = d3
+    .sliderBottom()
+    .min(d3.min(dataTime))
+    .max(d3.max(dataTime))
+    .step(1000 * 60 * 60 * 24 * 365)
+    .width(300)
+    .tickFormat(d3.timeFormat('%Y'))
+    .tickValues(dataTime)
+    .default(new Date(1998, 10, 3))
+    .on('onchange', val => {
+      d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+    });
+*/
 
 //
 //
