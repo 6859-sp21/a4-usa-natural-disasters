@@ -8,11 +8,11 @@
 body {
     font-family: "Open Sans", sans-serif;
     font-size: 16px;
-    padding: 40px;
+    padding: 20px;
 }
 
 h1 {
-  font-size: 3em;
+  font-size: 36px;
   font-weight: 700;
   color: #f8f8ff;
 }
@@ -62,40 +62,67 @@ a:hover{
 
     <h1>US Natural Disaster Declarations</h1>
     <h2>Year: <span id="year-value"></span></h2>
-    <br>
-    <br>
-    <div class="checkbox-filters">
-      <h4>Select the disaster type:</h4>
-      <div class="checkboxes">
-        <div id="water">
-          <input type="checkbox" name="water" value="water" id="checkbox" checked>
-          <label for="water">Water</label>
-        </div>
-        <div id="earth">
-          <input type="checkbox" name="earth" value="earth" id="checkbox" checked>
-          <label for="earth">Earth</label>
-        </div>
-        <div id="fire">
-          <input type="checkbox" name="fire" value="fire" id="checkbox" checked>
-          <label for="fire">Fire</label>
-        </div>
-        <div id="wind">
-          <input type="checkbox" name="wind" value="wind" id="checkbox" checked>
-          <label for="wind">Wind</label>
-        </div>
-        <div id="other">
-          <input type="checkbox" name="other" value="other" id="checkbox" checked>
-          <label for="other">Other</label>
+    <div id="vis"></div>
+    <div id="sidebar">
+      <div id="legend">
+        <!-- LEGEND/ LEGEND CONTENT -->
+        <div id="legend-content">
+          <h4> Disaster Count: </h4>
+          <div class= "line"> 
+            <div class="av" id= "pop>0">◼︎</div>
+            <div class="caption">0&nbsp;-&nbsp;190</div>
+          </div>
+          <div class= "line"> 
+            <div class="av" id= "pop_100">◼︎</div>
+            <div class="caption">190&nbsp;-&nbsp;380</div>
+          </div>
+          <div class= "line"> 
+            <div class="av" id= "pop_200">◼︎</div>
+            <div class="caption">380&nbsp;-&nbsp;570</div>
+          </div>
+          <div class= "line"> 
+            <div class="av" id= "pop_300">◼︎</div>
+            <div class="caption">570&nbsp;-&nbsp;760</div>
+          </div>
+          <div class= "line"> 
+            <div class="av" id= "pop_400">◼︎</div>
+            <div class="caption">761&nbsp;-&nbsp;and more</div>
+          </div>
+      </div>
+        <!-- DISASTER TYPE FILTER -->
+        <div class="checkbox-filters">
+          <h4>Disaster type:</h4>
+          <div class="checkboxes">
+            <div id="water">
+              <input type="checkbox" name="water" value="water" id="checkbox" checked>
+              <label for="water">Water</label>
+            </div>
+            <div id="earth">
+              <input type="checkbox" name="earth" value="earth" id="checkbox" checked>
+              <label for="earth">Earth</label>
+            </div>
+            <div id="fire">
+              <input type="checkbox" name="fire" value="fire" id="checkbox" checked>
+              <label for="fire">Fire</label>
+            </div>
+            <div id="wind">
+              <input type="checkbox" name="wind" value="wind" id="checkbox" checked>
+              <label for="wind">Wind</label>
+            </div>
+            <div id="other">
+              <input type="checkbox" name="other" value="other" id="checkbox" checked>
+              <label for="other">Other</label>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
-    <br>
-    <div id="vis"></div>
     <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
-    <!-- <div id="timeline-container"></div> -->
     <br><br>
     <!-- Slider Timeline -->
-    <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
+    <p id = "datacite">Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
+    <p id = "datacite">Created by: Helen Li, Kalyn Bowen and Yuji Chan.</p>
 
     <!-- MODAL STARTS HERE-->
     <div id="myModal" class="modal">
@@ -236,7 +263,7 @@ Object.entries(incident_type_to_generic_type).forEach(item => {
 })
 */
 
-var width = 1200, height = 800;
+var width = 1200, height = 600;
 
 var tip = d3.tip()
   .attr('class', 'd3-tip')
@@ -270,7 +297,7 @@ var svg = d3.select('#vis').append('svg')
 svg.call(tip);
 svg.call(circleTip);
 var projection = d3.geo.albersUsa()
-    .scale(1300) // mess with this if you want
+    .scale(1200) // mess with this if you want
     .translate([width / 2, height / 2]);
 
 var path = d3.geo.path()
@@ -363,9 +390,9 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       locMap[s.State] = [s.Longitude, s.Latitude]
     })
     
-    svg.append("g")
-      .attr("class", "legendLinear")
-      .attr("transform", "translate(20,20)");
+    // svg.append("g")
+    //   .attr("class", "legendLinear")
+    //   .attr("transform", "translate(20,20)");
     
     // console.log(countyMap)
     let lst = [];
@@ -398,8 +425,27 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
 
     var linear = colorScale;
 
-  
+// // Vertical legend
+// var indexToColor = d3.scale.linear()
+//                 .domain([0, 10])
+//                 .range(['rgb(46,73,123)', 'rgb(71, 187, 94)']);
+//     var range = d3.range(5).map(indexToColor);
+//     var quant = d3.scale.quantize()
+//               .domain([0, 200, 763])
+//               .range(range);
+    
+//     svg.append("g")
+//         .attr("class", "quantize")
+//         .attr("transform", "translate(800,50)");
+    
+//     var legendQuant = d3.legend.color()
+//                     .title("Number of Disasters")
+//                     .labelFormat(d3.format('.0f'))
+//                     .scale(quant);
+    
+//     svg.select(".quantize").call(legendQuant);
 
+    //previous horizontal legend
     var legendLinear = d3.legend.color()
       .shapeWidth(50)
       .orient('horizontal')
@@ -552,177 +598,6 @@ d3.select('#year-value').text((sliderTime.value()));
       d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
     });
 */
-
-//
-//
-//MY WORK STARTS HEREEEEE MY MY WORK STARTS HEREEEEE MY WORK STARTS HEREEEEEWORK STARTS HEREEEEE
-//
-// Loads US Natural disaster data.
-function getDisasterData() {
-  d3.csv("us_disaster_declarations.csv", function(error, dataForMap) {
-      if (error) return console.error(error);
-
-      var dataForTimeline = [],
-          dateToDisasterCount = {};
-
-      dataForMap.forEach(function(d, idx) {
-        // date = new Date(d.declaration_date) //TODO: IF WE WANT TO USE THE EXACT DATE
-        let date = d.fy_declared;
-        if (!dateToDisasterCount[date]) {
-            dateToDisasterCount[date] = 1;
-        } else {
-            dateToDisasterCount[date] += 1;
-        }
-      });      
-      Object.keys(dateToDisasterCount).forEach(function(time) {
-          dataForTimeline.push({ TIME: new Date(time), TOT: dateToDisasterCount[time] });
-      });
-      dataForTimeline.sort(function(a,b) { return a.TIME - b.TIME; });
-
-      // TODO: helen removed this but might need to put back in?
-      // radiusScale.domain(d3.extent(dataForMap, function(disaster) { return +crime.TOT; }));
-
-      makeTimeline(dataForMap, dataForTimeline);
-      
-  })
-}
-// Creates the event timeline and sets up callbacks for brush changes
-function makeTimeline(dataForMap, dataForTimeline) {
-  let mapWidth = 1200
-  var margin = { top: 10, right: 25, bottom: 20, left: 10 },
-      width  = mapWidth - margin.left - margin.right,
-      height = 100 - margin.top  - margin.bottom;
-
-  var timelineSvg = d3.select("#timeline-container").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom);
-
-  var timeline = timelineSvg.append("g")
-      .attr("class", "timeline")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  var x = d3.time.scale()
-      .domain(d3.extent(dataForTimeline.map(function(d) { return d.TIME; })))
-      .range([0, width]);
-
-  var y = d3.scale.linear()
-      .domain(d3.extent(dataForTimeline.map(function(d) { return d.TOT; })))
-      .range([height, 0]);
-
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("right")
-      .ticks(5);
-
-  var area = d3.svg.area()
-      .interpolate("linear")
-      .x(function(d) { return x(d.TIME); })
-      .y0(height)
-      .y1(function(d) { return y(d.TOT); });
-
-  timeline.append("path")
-      .datum(dataForTimeline)
-      .attr("class", "area")
-      .attr("d", area);
-
-  timeline.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-  
-  timeline.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
-
-  timeline.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("dy", "4em")
-      .style("text-anchor", "end")
-      .text("# Disasters");
-
-  // Add brush to timeline, hook up to callback
-  var brush = d3.svg.brush()
-      .x(x)
-      .on("brush", function() { brushCallback(brush, dataForMap); })
-      .extent([new Date("1953"), new Date("2021")]); // initial value
-
-  timeline.append("g")
-      .attr("class", "x brush")
-      .call(brush);
-    // .selectAll("rect")
-    //   .attr("y", -6)
-    //   .attr("height", height + 7);
-
-    brush.event(timeline.select('g.x.brush')); // dispatches a single brush event
-}
-
-  // Called whenever the timeline brush range (extent) is updated
-  // Filters the map data to those points that fall within the selected timeline range
-function brushCallback(brush, dataForMap) {
-  if (brush.empty()) {
-      updateMapPoints([]);
-      updateTitleText();
-  } else {
-      var newDateRange = brush.extent(),
-          filteredData = [];
-
-      dataForMap.forEach(function(d) {
-          if (d.TIME >= newDateRange[0] && d.TIME <= newDateRange[1]) {
-              filteredData.push(d);
-          }
-      });
-      // updateMapPoints(filteredData);
-      // updateTitleText(newDateRange);
-  }
-}
-
- // Updates the vis title text to include the passed date array: [start Date, end Date]
-//  function updateTitleText(newDateArray) {
-//     if (!newDateArray) {
-//         title.text("US Natural Disasters (select a year)");
-//     } else {
-//         var chosenYear = (newDateArray[0].getMonth() + 1) + "/" +
-//           (newDateArray[0].getDay() + 1) + "/" +
-//           newDateArray[0].getFullYear();
-//         title.text("US Natural Disasters in" + chosenYear);
-//     }
-//   }
-
-// Updates the points displayed on the map, to those in the passed data array
-// function updateMapPoints(data) {
-  // var circles = svg.selectAll("circle").data(data, function(d) { return d.TIME + d.TOT; });
-
-  // circles // update existing points
-  //   // .on("mouseover", tipMouseover)
-  //   // .on("mouseout", tipMouseout)
-  //   .attr("fill", function(d) { return colorScale(d.CR); })
-  //   .attr("cx", function(d) { return projection([+d.longitude, +d.latitude])[0]; })
-  //   .attr("cy", function(d) { return projection([+d.longitude, +d.latitude])[1]; })
-  //   .attr("r",  function(d) { return radiusScale(+d.TOT); });
-
-  // circles.enter().append("circle") // new entering points
-  //   .on("mouseover", tipMouseover)
-  //   .on("mouseout", tipMouseout)
-  //   .attr("fill", function(d) { return colorScale(d.CR); })
-  //   .attr("cx", function(d) { return projection([+d.longitude, +d.latitude])[0]; })
-  //   .attr("cy", function(d) { return projection([+d.longitude, +d.latitude])[1]; })
-  //   .attr("r",  0)
-  // .transition()
-  //   .duration(500)
-  //   .attr("r",  function(d) { return radiusScale(+d.TOT); });
-
-  // circles.exit() // exiting points
-  //   .attr("r",  function(d) { return radiusScale(+d.TOT); })
-  // .transition()
-  //   .duration(500)
-  //   .attr("r", 0).remove();
-  // }
-
-// d3.select('#slider6').call(d3.slider().axis(true).min(1953).max(2021).step(1));
 
 
 function showModal(d) {

@@ -2,7 +2,7 @@ body {
   background-color: #04091E;
 }
 
-h1, h2 {
+h1 {
   text-align: center;
   color: #f8f8ff;
   font-family: Georgia,Cambria,"Times New Roman",Times,serif;
@@ -10,7 +10,21 @@ h1, h2 {
   font-variant: normal; 
   font-weight: 400;
   line-height: 26.4px;
+  font-size: 30px;
 }
+
+h2 {
+  text-align: center;
+  color: #f8f8ff;
+  font-family: Georgia,Cambria,"Times New Roman",Times,serif;
+  font-style: normal; 
+  font-variant: normal; 
+  font-weight: 400;
+  line-height: 26.4px;
+  font-size: 20px;
+  margin: 20px, auto, 0px, auto;
+}
+
 
 h4 {
   color: #f8f8ff;
@@ -33,27 +47,117 @@ p{
   fill: #fff;
 }
 
+.quantize {
+  float: right;
+}
+
+.label ,.legendTitle{
+  fill:#fff;
+}
+
 .tick {
   fill: #fff;
 }
 
 .checkboxes {
   display: flex;
+  flex-direction: column;
   color: #fff;
 }
 
+.label {
+  margin: 50px;
+}
 .checkbox-filters {
-  border-style: double;
+  /* border-style: double; */
   color: #fff;
-  border-radius: 5px;
-  padding: 0px 5px 10px 5px;
-
+  /* border-radius: 5px; */
+  background: rgba(12, 12, 12, 0.85);
+  padding: 5px;
+  margin-top: 10px;
+  width: 140px;
+  height: 150px;
+  float: right;
 }
 
 .checkboxes > * {
   flex: 1 1 0;
 }
 
+svg{
+  display: block;
+  margin: auto;
+  padding: 0px;
+}
+
+#slider6{
+  display: flex;
+  width: 880px;
+  margin: 20px auto 0px auto;
+}
+
+/* SIDEBAR */
+#sidebar {
+  position: absolute;
+  z-index: 1012022;
+  top: 60px;
+  right: 10px;
+  width: 150px;
+}
+
+/* LEGEND */
+.av {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.caption {
+  display: inline-block;
+}
+
+#legend {
+  z-index: 1012022;
+  background: rgba(12, 12, 12, 0.85);
+  font-size: 12px;
+}
+
+#legend-content {
+  padding: 5px;
+  display: block;
+}
+
+.line {
+  line-height: 18px;
+  display: flex;
+  color: #f8f8ff;
+}
+
+#pop_0 {
+  color: #FFF7EC;
+}
+
+#pop_100 {
+  color: #E5BCAB;
+}
+
+#pop_200 {
+  color: #C8836F;
+}
+
+#pop_300 {
+  color: #A74B37;
+}
+
+#pop_400 {
+  color: #800002;
+}
+
+/* DATA CITING SECTION */
+#datacite {
+  text-align: center;
+}
 /* Timeline Slider Feature Styles */
 .d3-slider {
   position: relative;
@@ -128,13 +232,3 @@ p{
   margin-bottom: -.6em;      
 }
 
-svg{
-  display: block;
-  margin: auto;
-}
-
-#slider6{
-  display: flex;
-  width: 880px;
-  margin: 50px auto 0px auto;
-}
