@@ -292,8 +292,14 @@ function update(){
     }
   })
 }
-var g = svg.append("g");
 
+svg.append("rect")
+    .attr("class", "background")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("fill", "#04091E")
+    .on("click", clicked);
+var g = svg.append("g");
 var centered;
 
 function loaded(error, usa, mortality, usa_cities, usa_states) {
