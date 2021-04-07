@@ -226,11 +226,11 @@ var tip = d3.tip()
   .attr('class', 'd3-tip')
   .offset([-5, 0])
   .html(function(d) {
-    var dataRow = countryById[name_to_abbr[d.properties.name]];
+    var dataRow = countryById[sliderTime.value()][name_to_abbr[d.properties.name]];
        if (dataRow) {
            return d.properties.name + ": " + dataRow;
        } else {
-           return d.properties.name + ": No data.";
+           return d.properties.name + ": 0";
        }
   })
 
@@ -265,7 +265,7 @@ queue()
     .await(loaded);
 
 function getColor(d) {
-    var dataRow = countryById[name_to_abbr[d.properties.name]];
+    var dataRow = countryById[sliderTime.value()][name_to_abbr[d.properties.name]];
        if (dataRow) {
            return colorScale(dataRow);
        } else {
@@ -303,20 +303,24 @@ svg.append("rect")
     .on("click", clicked);
 var g = svg.append("g");
 var centered;
-
+var states; 
 function loaded(error, usa, mortality, usa_cities, usa_states) {
 
     // console.log(usa);
     // console.log(mortality);
     // console.log(usa_cities)
-    statesCount = {};
+    statesCountByYear = {};
     mortality.forEach(d => {
-      if (!(d.state in countryById)) {
-        countryById[d.state] = 0;
-        statesCount[d.state] = 0;
+      if (!(d.fy_declared in countryById)) {
+        countryById[d.fy_declared] = {};
+        statesCountByYear[d.fy_declared] = {};
       }
-      countryById[d.state] += 1;
-      statesCount[d.state] += 1;
+      if (!(d.state in countryById[d.fy_declared])) {
+        countryById[d.fy_declared][d.state] = 0;
+        statesCountByYear[d.fy_declared][d.state] = 0;
+      }
+      countryById[d.fy_declared][d.state] += 1;
+      statesCountByYear[d.fy_declared][d.state] += 1;
     });
 
     locMap = {} // key (county, city, or state): value (longitude, latitude)
@@ -335,15 +339,17 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     
     // console.log(countyMap)
     let lst = [];
-    for (const [key, value] of Object.entries(statesCount)) {
-      let newObj = {};
-      newObj["key"] = value;
-      lst.push(newObj);
+    for (const [key, value] of Object.entries(statesCountByYear)) {
+      for (const [key2, value2] of Object.entries(value)) {
+        let newObj = {};
+        newObj["key"] = value2;
+        lst.push(newObj);
+      }
     }
     
     colorScale.domain(d3.extent(lst, function(d) {return d.key;}));
 
-    var states = topojson.feature(usa, usa.objects.states).features;
+    states = topojson.feature(usa, usa.objects.states).features;
 
     g.selectAll('path.states')
       .data(states)
@@ -437,6 +443,11 @@ function clicked(d) {
 var myFn = function(slider) {
   var value = sliderTime.value();
   d3.select('#year-value').text(value);
+  g.selectAll('path.states')
+      .attr('fill', function(d,i) {
+          //console.log(d.properties.name);
+          return getColor(d);
+      })
 }
 
 // Set slider callback function
