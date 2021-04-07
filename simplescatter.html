@@ -2,6 +2,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="modal-style.css">
 
 <style>
 body {
@@ -55,12 +56,14 @@ a:hover{
 }
 </style>
 
-<head><title>US Natural Disaster Declations</title></head>
+<head><title>US Natural Disaster Declarations</title></head>
 
 <body>
 
     <h1>US Natural Disaster Declarations</h1>
     <h2>Year: 2015</h2>
+
+    </div>
     <div class="checkbox-filters">
       <h4>Select the disaster type:</h4>
       <div class="checkboxes">
@@ -94,6 +97,19 @@ a:hover{
     <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
     <p>Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
 
+    <!-- MODAL STARTS HERE-->
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="close">&times;</span>
+          <h2 id="modal-header-text">Modal Header</h2>
+        </div>
+        <div class="modal-body">
+          <p id="modal-body-text">Some text in the Modal Body</p>
+        </div>
+      </div>
+    <!-- MODAL ENDS HERE-->
    
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script src="//d3js.org/queue.v1.min.js"></script>
@@ -232,6 +248,15 @@ var tip = d3.tip()
        }
   })
 
+var circleTip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-5, 0])
+  .html(function(d) {
+    console.log(d)
+    return Date(d.declaration_date) + ":<br><br>" + d.declaration_title
+            + "<br><br>Click to learn more!";
+  })
+
 
 var svg = d3.select('#vis').append('svg')
     .attr('width', width)
@@ -242,7 +267,7 @@ var svg = d3.select('#vis').append('svg')
   .append("g");*/
 
 svg.call(tip);
-
+svg.call(circleTip);
 var projection = d3.geo.albersUsa()
     .scale(1300) // mess with this if you want
     .translate([width / 2, height / 2]);
@@ -398,7 +423,12 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       .style("fill", function(d) {
         return incident_to_color[incident_type_to_generic_type[d.incident_type]]
       })	
-      .style("opacity", 0.5)	
+      .style("opacity", 0.5)
+      .on('mouseover', circleTip.show)
+      .on('mouseout', circleTip.hide)
+      .on('click', function(d) {
+        showModal(d)
+      })
 
     // When a button change, run the update function
     d3.selectAll("#checkbox").on("change", update);
@@ -604,6 +634,28 @@ function brushCallback(brush, dataForMap) {
 // d3.select('#slider6').call(d3.slider().axis(true).min(1953).max(2021).step(1));
 
 
+function showModal(d) {
+  // Show Modal
+  var modal = document.getElementById("myModal");
+  modal.style.display = "block";
+
+  // Set text
+  var modalHeader = document.getElementById("modal-header-text");
+  var modalBody = document.getElementById("modal-body-text");
+  modalHeader.innerHTML = Date(d.declaration_date);
+  modalBody.innerHTML = "Type: " + d.declaration_title + "<br><br>Area: " + d.designated_area;
+
+  // Deal with closing
+  var span = document.getElementsByClassName("close")[0];
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+}
 </script>
 </body>
 </html>
