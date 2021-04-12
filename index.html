@@ -286,15 +286,21 @@ incident_type_to_generic_type = {
 incident_to_color = {
   water: "rgb(0,0,136)",
   earth: "rgb(0,136,0)",
-  wind: "rgb(100,100,0)",
+  // wind: "rgb(100,100,0)",
   fire: "rgb(136,0,0)",
   other: "rgb(128,128,128)"
 }
 mortalityList = []
 circlePointsList = []
-globalYear = "1953"
+
 zoomedIn = false
-// adding the filter by incident checkboxes
+locMap2 = {} // (state) : {(county, city, or state): (longitude, latitude)}
+
+// below are ways to filter the natural disaster data
+globalYear = "1965"
+globalClickedState = "all"
+globalCheckboxesSelected = new Set(Object.keys(incident_to_color))
+
 /*
 Object.entries(incident_type_to_generic_type).forEach(item => {
   let incidentWithSpaces = item[0];
@@ -416,7 +422,16 @@ function getColor(d) {
 }
 
 function setCirclePointsList() {
-  circlePointsList = mortalityList.filter(m => m.state in locMap && m.fy_declared === globalYear.toString());
+  if (globalClickedState === "all") {
+    console.log(1)
+    circlePointsList = mortalityList
+      .filter(m => m.fy_declared === globalYear.toString() 
+        && globalCheckboxesSelected.has(incident_type_to_generic_type[m.incident_type]));
+  } else {
+    circlePointsList = mortalityList
+      .filter(m => m.state === globalClickedState && m.fy_declared === globalYear.toString() 
+        && globalCheckboxesSelected.has(incident_type_to_generic_type[m.incident_type]));
+  }
 }
 
 function setEmptyCirclePointsList() {
@@ -428,21 +443,33 @@ function removeSpaceAndPunc(s) {
   return s.replace(/ /g, "")
 }
 
+function findLonLat(state, designated_area) {
+  if (state in locMap2) {
+    if (designated_area in locMap2[state]) {
+      return locMap2[state][designated_area]
+    } else {
+      return locMap2[state]['statewide']
+    }
+  }
+  return null
+}
+
 function update(){
   // For each check box:
   d3.selectAll("#checkbox").each(function(d){
     cb = d3.select(this);
     grp = cb.property("value")
-
     // If the box is check, show the group
     if (cb.property("checked")){
-      svg.selectAll("#"+grp).transition().duration(750).style("opacity", 0.5).attr("r", 4 )
-
+      // svg.selectAll("#"+grp).transition().duration(500).style("opacity", 0.5).attr("r", 2 )
+      globalCheckboxesSelected.add(grp)
     // Otherwise hide it
     } else{
-      svg.selectAll("#"+grp).transition().duration(750).style("opacity", 0).attr("r", 0)
+      // svg.selectAll("#"+grp).transition().duration(500).style("opacity", 0).attr("r", 0)
+      globalCheckboxesSelected.delete(grp)
     }
   })
+  updateCirclePoints()
 }
 
 svg.append("rect")
@@ -454,7 +481,6 @@ svg.append("rect")
 var g = svg.append("g");
 var centered;
 var states; 
-
 function loaded(error, usa, mortality, usa_cities, usa_states) {
     mortalityList = mortality
     statesCountByYear = {};
@@ -471,22 +497,24 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       statesCountByYear[d.fy_declared][d.state] += 1;
     });
 
-    locMap = {} // key (county, city, or state): value (longitude, latitude)
-    locMap2 = {}
+
     
     usa_cities.forEach(c => {
       if (!(name_to_abbr[c.state_name] in locMap2)) {
         locMap2[name_to_abbr[c.state_name]] = {};
       }
-      locMap[c.county_name + " (County)"] = [c.lng, c.lat]
-      locMap[c.city] = [c.lng, c.lat]
       locMap2[name_to_abbr[c.state_name]][c.county_name + " (County)"] = [c.lng, c.lat]
     });
 
     usa_states.forEach(s => {
-      locMap[s.State] = [s.Longitude, s.Latitude]
+      if (s.State in locMap2) {
+        locMap2[s.State]['statewide'] = [s.Longitude, s.Latitude]
+      } else {
+        locMap2[s.State] = {}
+        locMap2[s.State]['statewide'] = [s.Longitude, s.Latitude]
+      }
     })
-    
+    mortalityList.filter(m => m.state in locMap2)
     let lst = [];
     for (const [key, value] of Object.entries(statesCountByYear)) {
       for (const [key2, value2] of Object.entries(value)) {
@@ -564,6 +592,7 @@ function clicked(d) {
     y = centroid[1];
     k = sizes[d.properties.name];
     centered = d;
+    globalClickedState = name_to_abbr[d.properties.name]
   } else { // clicking on background
     zoomedIn = false
     x = width / 2;
@@ -571,7 +600,6 @@ function clicked(d) {
     k = 1;
     centered = null;
   }
-  updateCirclePoints()
   
   g.transition()
       .duration(500)
@@ -580,6 +608,8 @@ function clicked(d) {
 
       g.selectAll("path")
       .classed("active", centered && function(d) { return d !== centered; });
+  updateCirclePoints() // state name abbreviation to update for
+
 }
 
 
@@ -594,27 +624,26 @@ function updateCirclePoints() {
     var updateSelection = g.selectAll("circle")
     .data(circlePointsList)
 
+
   var exitSelection = updateSelection.exit().remove(); // remove the ones exiting
       
   var enterSelection = updateSelection.enter()
       .append("circle")
       .attr("id", function (d) { return incident_type_to_generic_type[d.incident_type]})
       .attr("cx", function(d) {
-        if (d.designated_area in locMap){
-          return projection(locMap[d.designated_area])[0];
-        } else {
-          return projection(locMap[d.state])[0];
-        }
+        lonlat = findLonLat(d.state, d.designated_area)
+        if (lonlat !== null){
+          return projection(lonlat)[0];
+        } 
       })
       .attr("cy", function(d) {
-        if (d.designated_area in locMap) {
-          return projection(locMap[d.designated_area])[1];
-        } else {
-          return projection(locMap[d.state])[1];
-        }
+        lonlat = findLonLat(d.state, d.designated_area)
+        if (lonlat !== null) {
+          return projection(lonlat)[1];
+        } 
       })
       .attr("r", function(d) {
-        return 4
+        return 2
       })		
       .style("fill", function(d) {
         return incident_to_color[incident_type_to_generic_type[d.incident_type]]
