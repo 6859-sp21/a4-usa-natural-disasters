@@ -67,7 +67,7 @@ a:hover{
       <div id="legend">
         <!-- LEGEND/ LEGEND CONTENT -->
         <div id="legend-content">
-          <h4> Disaster Count: </h4>
+          <h4> Disaster Count (All Types)): </h4>
           <div class= "line"> 
             <div class="av" id= "pop>0">◼︎</div>
             <div class="caption">0&nbsp;-&nbsp;190</div>
@@ -91,7 +91,7 @@ a:hover{
       </div>
         <!-- DISASTER TYPE FILTER -->
         <div class="checkbox-filters">
-          <h4>Disaster type:</h4>
+          <h4>Disaster Type (For Dots):</h4>
           <div class="checkboxes">
             <div id="water">
               <input type="checkbox" name="water" value="water" id="checkbox" checked>
@@ -118,10 +118,12 @@ a:hover{
       </div>
 
     </div>
+    <!--<button id="play-button">Play</button>--> 
+    <br><br>
     <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
     <br><br>
     <!-- Slider Timeline -->
-    <p id = "datacite">Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1953 - today.</p>
+    <p id = "datacite">Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1965 - 2020.</p>
     <p id = "datacite">Created by: Helen Li, Kalyn Bowen and Yuji Chan.</p>
 
     <!-- MODAL STARTS HERE-->
@@ -199,6 +201,59 @@ name_to_abbr = {
         "West Virginia": "WV",
         Wisconsin: "WI",
         Wyoming: "WY",
+};
+
+sizes = {
+        Arizona: 4,
+        Alabama: 5,
+        Alaska: 4,
+        Arkansas: 5,
+        California: 2,
+        Colorado: 4,
+        Connecticut: 12,
+        Delaware: 12,
+        Florida: 4,
+        Georgia: 5,
+        Hawaii: 5,
+        Idaho: 3,
+        Illinois: 4,
+        Indiana: 4,
+        Iowa: 5,
+        Kansas: 5,
+        Kentucky: 6,
+        Louisiana: 6,
+        Maine: 5,
+        Maryland: 7,
+        Massachusetts: 10,
+        Michigan: 4,
+        Minnesota: 4,
+        Mississippi: 5,
+        Missouri: 4,
+        Montana: 4,
+        Nebraska: 5,
+        Nevada: 3,
+        "New Hampshire": 7,
+        "New Jersey": 7,
+        "New Mexico": 4,
+        "New York": 5,
+        "North Carolina": 5,
+        "North Dakota": 5,
+        Ohio: 5,
+        Oklahoma: 5,
+        Oregon: 4,
+        Pennsylvania: 6,
+        "Rhode Island": 12,
+        "South Carolina": 6,
+        "South Dakota": 5,
+        Tennessee: 6,
+        Texas: 2,
+        Utah: 4,
+        Vermont: 7,
+        Virginia: 5,
+        Washington: 5,
+        "West Virginia": 6,
+        Wisconsin: 4,
+        Wyoming: 4,
 };
 
 incident_type_to_generic_type = {
@@ -294,6 +349,41 @@ var svg = d3.select('#vis').append('svg')
   }))
   .append("g");*/
 
+// PLAY BUTTON CODE 
+// var moving = false;
+// var currentValue = 0;
+// var targetValue = width;
+// var playButton = d3.select("#play-button");
+// playButton
+//     .on("click", function() {
+//     var button = d3.select(this);
+//     if (button.text() == "Pause") {
+//       // timer = 0;
+//       moving = false;
+//       clearInterval(timer);
+//       button.text("Play");
+//     } else {
+//       moving = true;
+//       timer = setInterval(step, 100);
+//       button.text("Pause");
+//     }
+//     console.log("Slider moving: " + moving);
+//   })
+
+// function step() {
+
+//   currentValue = currentValue + (targetValue/151);
+//   console.log(currentValue, targetValue)
+//   if (currentValue > targetValue) {
+//     moving = false;
+//     currentValue = 0;
+//     clearInterval(timer);
+//     // timer = 0;
+//     playButton.text("Play");
+//     console.log("Slider moving: " + moving);
+//   }
+// }
+
 svg.call(tip);
 svg.call(circleTip);
 var projection = d3.geo.albersUsa()
@@ -320,7 +410,7 @@ function getColor(d) {
   if (dataRow) {
       return colorScale(dataRow);
   } else {
-    return "#ccc";
+    return "white";
   }
 }
 
@@ -361,10 +451,6 @@ var centered;
 var states; 
 
 function loaded(error, usa, mortality, usa_cities, usa_states) {
-
-    // console.log(usa);
-    // console.log(mortality);
-    // console.log(usa_cities)
     mortalityList = mortality
     statesCountByYear = {};
     mortality.forEach(d => {
@@ -381,20 +467,21 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     });
 
     locMap = {} // key (county, city, or state): value (longitude, latitude)
+    locMap2 = {}
+    
     usa_cities.forEach(c => {
+      if (!(name_to_abbr[c.state_name] in locMap2)) {
+        locMap2[name_to_abbr[c.state_name]] = {};
+      }
       locMap[c.county_name + " (County)"] = [c.lng, c.lat]
       locMap[c.city] = [c.lng, c.lat]
+      locMap2[name_to_abbr[c.state_name]][c.county_name + " (County)"] = [c.lng, c.lat]
     });
 
     usa_states.forEach(s => {
       locMap[s.State] = [s.Longitude, s.Latitude]
     })
     
-    // svg.append("g")
-    //   .attr("class", "legendLinear")
-    //   .attr("transform", "translate(20,20)");
-    
-    // console.log(countyMap)
     let lst = [];
     for (const [key, value] of Object.entries(statesCountByYear)) {
       for (const [key2, value2] of Object.entries(value)) {
@@ -414,6 +501,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       .append('path')
       .attr('class', 'states')
       .attr('d', path)
+      .attr("id", "states")
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide)
       .on("click", clicked)
@@ -502,7 +590,7 @@ function clicked(d) {
     var centroid = path.centroid(d);
     x = centroid[0];
     y = centroid[1];
-    k = 4;
+    k = sizes[d.properties.name];
     centered = d;
   } else {
     x = width / 2;
@@ -511,13 +599,14 @@ function clicked(d) {
     centered = null;
   }
 
-  g.selectAll("path")
-      .classed("active", centered && function(d) { return d === centered; });
   
   g.transition()
-      .duration(750)
+      .duration(500)
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
       .style("stroke-width", 1.5 / k + "px");
+
+      g.selectAll("path")
+      .classed("active", centered && function(d) { return d !== centered; });
 }
 
 
@@ -525,8 +614,8 @@ function updateCirclePoints(year) {
   setCirclePointsList(year)
 
     //Make Selection
-    var updateSelection = g.selectAll("circle")
-    .data(circlePointsList)
+     var updateSelection = g.selectAll("circle")
+     .data(circlePointsList)
 
   var exitSelection = updateSelection.exit().remove(); // remove the ones exiting
       
@@ -566,7 +655,6 @@ var myFn = function(slider) {
   d3.select('#year-value').text(value);
   g.selectAll('path.states')
     .attr('fill', function(d,i) {
-        //console.log(d.properties.name);
         return getColor(d);
     })
   updateCirclePoints(value);
@@ -574,7 +662,7 @@ var myFn = function(slider) {
 
 // Set slider callback function
 
-var sliderTime = d3.slider().axis(true).min(1953).max(2020).step(1).on('slide', myFn);
+var sliderTime = d3.slider().axis(true).min(1965).max(2020).step(1).on('slide', myFn);
 d3.select('#slider6').call(sliderTime);
 d3.select('#year-value').text((sliderTime.value()));
 /*var xAxis = d3.svg.axis()
