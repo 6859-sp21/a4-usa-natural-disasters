@@ -94,15 +94,15 @@ a:hover{
           <h4>Disaster Type (For Dots):</h4>
           <div class="checkboxes">
             <div id="water">
-              <input type="checkbox" name="water" value="water" id="checkbox" checked>
+              <input type="checkbox" name="water" value="water" id="checkbox1" checked>
               <label for="water">Water</label>
             </div>
             <div id="earth">
-              <input type="checkbox" name="earth" value="earth" id="checkbox" checked>
+              <input type="checkbox" name="earth" value="earth" id="checkbox2" checked>
               <label for="earth">Earth</label>
             </div>
             <div id="fire">
-              <input type="checkbox" name="fire" value="fire" id="checkbox" checked>
+              <input type="checkbox" name="fire" value="fire" id="checkbox3" checked>
               <label for="fire">Fire</label>
             </div>
             <!-- <div id="wind">
@@ -110,7 +110,7 @@ a:hover{
               <label for="wind">Wind</label>
             </div> -->
             <div id="other">
-              <input type="checkbox" name="other" value="other" id="checkbox" checked>
+              <input type="checkbox" name="other" value="other" id="checkbox4" checked>
               <label for="other">Other</label>
             </div>
           </div>
@@ -397,6 +397,7 @@ var path = d3.geo.path()
 var colorScale = d3.scale.linear().range(["#fff7ec", "#7f0000"]).interpolate(d3.interpolateLab);
 
 var countryById = d3.map();
+var countryById2 = d3.map();
 
 // we use queue because we have 2 data files to load.
 queue()
@@ -406,9 +407,27 @@ queue()
     .defer(d3.csv, "us_state_latlong.csv") //https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
     .await(loaded);
 
+function getCheckedCounts(year, state) {
+  const checkboxIds = {"checkbox1": "water", "checkbox2": "earth", "checkbox3": "fire", "checkbox4": "other"};
+  let totalCount = 0;
+  console.log("year, state: " + year, state)
+  for (const [key, value] of Object.entries(checkboxIds)) {
+    console.log(document.getElementById(key).checked);
+    if (document.getElementById(key).checked) {
+      console.log("actual thing: " + countryById2[year][state][value])
+      totalCount += countryById2[year][state][value];
+    }
+  }
+  console.log(totalCount)
+  return totalCount;
+}
+
 function getColor(d) {
   var dataRow = countryById[sliderTime.value()][name_to_abbr[d.properties.name]];
+  var countForStateByType = countryById2[sliderTime.value()][name_to_abbr[d.properties.name]];
   if (dataRow) {
+      console.log("datarow: " + dataRow)
+      console.log(getCheckedCounts(sliderTime.value(), name_to_abbr[d.properties.name]));
       return colorScale(dataRow);
   } else {
     return "white";
@@ -459,6 +478,16 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
     mortalityList = mortality
     statesCountByYear = {};
     mortality.forEach(d => {
+      if (!(d.fy_declared in countryById2)) {
+        countryById2[d.fy_declared] = {};
+      }
+      if (!(d.state in countryById2[d.fy_declared])) {
+        countryById2[d.fy_declared][d.state] = {};
+      }
+      if (!(incident_type_to_generic_type[d.incident_type] in countryById2[d.fy_declared][d.state])) {
+        countryById2[d.fy_declared][d.state][incident_type_to_generic_type[d.incident_type]] = 0;
+      }
+      countryById2[d.fy_declared][d.state][incident_type_to_generic_type[d.incident_type]] += 1;
       if (!(d.fy_declared in countryById)) {
         countryById[d.fy_declared] = {};
         statesCountByYear[d.fy_declared] = {};
