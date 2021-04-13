@@ -94,15 +94,15 @@ a:hover{
           <h4>Disaster Type (For Dots):</h4>
           <div class="checkboxes">
             <div id="water">
-              <input type="checkbox" name="water" value="water" id="checkbox1" checked>
+              <input type="checkbox" name="water" value="water" id="checkbox1" onclick="myFn()" checked>
               <label for="water">Water</label>
             </div>
             <div id="earth">
-              <input type="checkbox" name="earth" value="earth" id="checkbox2" checked>
+              <input type="checkbox" name="earth" value="earth" id="checkbox2" onclick="myFn()" checked>
               <label for="earth">Earth</label>
             </div>
             <div id="fire">
-              <input type="checkbox" name="fire" value="fire" id="checkbox3" checked>
+              <input type="checkbox" name="fire" value="fire" id="checkbox3" onclick="myFn()" checked>
               <label for="fire">Fire</label>
             </div>
             <!-- <div id="wind">
@@ -110,7 +110,7 @@ a:hover{
               <label for="wind">Wind</label>
             </div> -->
             <div id="other">
-              <input type="checkbox" name="other" value="other" id="checkbox4" checked>
+              <input type="checkbox" name="other" value="other" id="checkbox4" onclick="myFn()" checked>
               <label for="other">Other</label>
             </div>
           </div>
@@ -416,15 +416,13 @@ queue()
 function getCheckedCounts(year, state) {
   const checkboxIds = {"checkbox1": "water", "checkbox2": "earth", "checkbox3": "fire", "checkbox4": "other"};
   let totalCount = 0;
-  console.log("year, state: " + year, state)
+  
   for (const [key, value] of Object.entries(checkboxIds)) {
-    console.log(document.getElementById(key).checked);
-    if (document.getElementById(key).checked) {
-      console.log("actual thing: " + countryById2[year][state][value])
+    //console.log(year + " " + state + " " + key + " " + document.getElementById(key).checked)
+    if (document.getElementById(key).checked && value in countryById2[year][state]) {
       totalCount += countryById2[year][state][value];
     }
   }
-  console.log(totalCount)
   return totalCount;
 }
 
@@ -432,9 +430,7 @@ function getColor(d) {
   var dataRow = countryById[sliderTime.value()][name_to_abbr[d.properties.name]];
   var countForStateByType = countryById2[sliderTime.value()][name_to_abbr[d.properties.name]];
   if (dataRow) {
-      console.log("datarow: " + dataRow)
-      console.log(getCheckedCounts(sliderTime.value(), name_to_abbr[d.properties.name]));
-      return colorScale(dataRow);
+      return colorScale(getCheckedCounts(sliderTime.value(), name_to_abbr[d.properties.name]));
   } else {
     return "white";
   }
@@ -473,7 +469,7 @@ function findLonLat(state, designated_area) {
   return null
 }
 
-function update(){
+function updateHelper(){
   // For each check box:
   d3.selectAll("#checkbox").each(function(d){
     cb = d3.select(this);
@@ -489,6 +485,12 @@ function update(){
     }
   })
   updateCirclePoints()
+}
+
+function update() {
+  console.log("here")
+  updateHelper();
+  myFn();
 }
 
 svg.append("rect")
