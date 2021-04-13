@@ -94,15 +94,15 @@ a:hover{
           <h4>Disaster Type (For Dots):</h4>
           <div class="checkboxes">
             <div id="water">
-              <input type="checkbox" name="water" value="water" id="checkbox1" onclick="myFn()" checked>
+              <input type="checkbox" name="water" value="water" class="checkbox" id="checkbox1" onclick="myFn()" checked>
               <label for="water">Water</label>
             </div>
             <div id="earth">
-              <input type="checkbox" name="earth" value="earth" id="checkbox2" onclick="myFn()" checked>
+              <input type="checkbox" name="earth" value="earth" class="checkbox" id="checkbox2" onclick="myFn()" checked>
               <label for="earth">Earth</label>
             </div>
             <div id="fire">
-              <input type="checkbox" name="fire" value="fire" id="checkbox3" onclick="myFn()" checked>
+              <input type="checkbox" name="fire" value="fire" class="checkbox" id="checkbox3" onclick="myFn()" checked>
               <label for="fire">Fire</label>
             </div>
             <!-- <div id="wind">
@@ -110,7 +110,7 @@ a:hover{
               <label for="wind">Wind</label>
             </div> -->
             <div id="other">
-              <input type="checkbox" name="other" value="other" id="checkbox4" onclick="myFn()" checked>
+              <input type="checkbox" name="other" value="other" class="checkbox" id="checkbox4" onclick="myFn()" checked>
               <label for="other">Other</label>
             </div>
           </div>
@@ -471,7 +471,7 @@ function findLonLat(state, designated_area) {
 
 function updateHelper(){
   // For each check box:
-  d3.selectAll("#checkbox").each(function(d){
+  d3.selectAll(".checkbox").each(function(d){
     cb = d3.select(this);
     grp = cb.property("value")
     // If the box is check, show the group
@@ -598,7 +598,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
 //     svg.select(".quantize").call(legendQuant);
 
     // When a button change, run the update function
-    d3.selectAll("#checkbox").on("change", update);
+    d3.selectAll(".checkbox").on("change", update);
     // And initialize it at the beginning
     update();
 
@@ -652,39 +652,44 @@ function updateCirclePoints() {
   }
 
   //Make Selection
-    var updateSelection = g.selectAll("circle")
-    .data(circlePointsList)
+  var updateSelection = g.selectAll("circle")
+  .data(circlePointsList)
 
 
   var exitSelection = updateSelection.exit().remove(); // remove the ones exiting
       
-  var enterSelection = updateSelection.enter()
-      .append("circle")
-      .attr("id", function (d) { return incident_type_to_generic_type[d.incident_type]})
-      .attr("cx", function(d) {
-        lonlat = findLonLat(d.state, d.designated_area)
-        if (lonlat !== null){
-          return projection(lonlat)[0];
-        } 
-      })
-      .attr("cy", function(d) {
-        lonlat = findLonLat(d.state, d.designated_area)
-        if (lonlat !== null) {
-          return projection(lonlat)[1];
-        } 
-      })
-      .attr("r", function(d) {
-        return 2
-      })		
-      .style("fill", function(d) {
-        return incident_to_color[incident_type_to_generic_type[d.incident_type]]
-      })	
-      .style("opacity", 0.5)
-      .on('mouseover', circleTip.show)
-      .on('mouseout', circleTip.hide)
-      .on('click', function(d) {
-        showModal(d)
-      })
+  var enterSelection = updateSelection.enter() // creating the ones that enter
+    .append("circle")
+    .attr("id", function (d) { return incident_type_to_generic_type[d.incident_type]})
+    .attr("cx", function(d) {
+      lonlat = findLonLat(d.state, d.designated_area)
+      if (lonlat !== null){
+        return projection(lonlat)[0];
+      } 
+    })
+    .attr("cy", function(d) {
+      lonlat = findLonLat(d.state, d.designated_area)
+      if (lonlat !== null) {
+        return projection(lonlat)[1];
+      } 
+    })
+    .attr("r", function(d) {
+      return 2
+    })		
+    .style("fill", function(d) {
+      return incident_to_color[incident_type_to_generic_type[d.incident_type]]
+    })	
+    .style("opacity", 0.5)
+    .on('mouseover', circleTip.show)
+    .on('mouseout', circleTip.hide)
+    .on('click', function(d) {
+      showModal(d)
+    })
+  
+  updateSelection.transition() // updating the colors of the existing ones
+    .style("fill", function(d) {
+      return incident_to_color[incident_type_to_generic_type[d.incident_type]]
+    })	
 }
 
 var myFn = function(slider) {
@@ -733,7 +738,7 @@ function showModal(d) {
   var modalHeader = document.getElementById("modal-header-text");
   var modalBody = document.getElementById("modal-body-text");
   modalHeader.innerHTML = Date(d.declaration_date);
-  modalBody.innerHTML = "Type: " + d.declaration_title + "<br><br>Area: " + d.designated_area;
+  modalBody.innerHTML = "Incident Type: " + d.incident_type + "<br><br>Declaration Title: " + d.declaration_title + "<br><br>Area: " + d.designated_area;
 
   // Deal with closing
   var span = document.getElementsByClassName("close")[0];
