@@ -332,8 +332,9 @@ var tip = d3.tip()
   .offset([-5, 0])
   .html(function(d) {
     var dataRow = countryById[sliderTime.value()][name_to_abbr[d.properties.name]];
+    
        if (dataRow) {
-           return d.properties.name + ": " + dataRow;
+           return d.properties.name + ": " + getCheckedCounts(sliderTime.value(), name_to_abbr[d.properties.name]);
        } else {
            return d.properties.name + ": 0";
        }
