@@ -588,6 +588,29 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       })
       .append("title");
 
+       // add state names
+      g.attr("class", "states-names")
+        .selectAll("text")
+        .data(states)
+        .enter()
+        .append("svg:text")
+        .text(function(d){
+          return name_to_abbr[d.properties.name]
+        })
+        .attr("x", function(d){
+          if (!Number.isNaN(path.centroid(d)[0])) {
+            return path.centroid(d)[0];
+          } 
+        })
+        .attr("y", function(d){
+          if (!Number.isNaN(path.centroid(d)[1])) {
+            return  path.centroid(d)[1];
+          } 
+        })
+        .attr("text-anchor","middle")
+        .attr('fill', 'black')
+        .attr('font-size', '11px');
+
     var linear = colorScale;
 
 // // Vertical legend
