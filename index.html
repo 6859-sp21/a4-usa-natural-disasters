@@ -6,15 +6,9 @@
 
 <style>
 body {
-    font-family: "Open Sans", sans-serif;
-    font-size: 16px;
-    padding: 20px;
-}
-
-h1 {
-  font-size: 36px;
-  font-weight: 700;
-  color: #f8f8ff;
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  padding: 20px;
 }
 
 a {
@@ -56,11 +50,10 @@ a:hover{
 }
 </style>
 
-<head><title>US Natural Disaster Declarations</title></head>
-
 <body>
+    <!-- GLOBAL TEMPERATURE -->
+  <div id="weatherRadial"></div> 
 
-    <h1>US Natural Disaster Declarations</h1>
     <h2>Year: <span id="year-value"></span></h2>
     <div id="vis"></div>
     <div id="sidebar">
@@ -89,6 +82,7 @@ a:hover{
             <div class="caption">761&nbsp;-&nbsp;and more</div>
           </div>
       </div>
+
         <!-- DISASTER TYPE FILTER -->
         <div class="checkbox-filters">
           <h4>Disaster Type (For Dots):</h4>
@@ -118,8 +112,21 @@ a:hover{
       </div>
 
     </div>
+    <!-- TITLE BOX -->
+    <div id="titlebox" style="display:block"> 
+      <div id="titlebox-header">
+        <h3>Consequences of Climate Change</h3>
+      </div>
+      <div id="titlebox-content">
+        <p>
+          The visualization you see here is a model of the natural disasters occurring
+          in the United States and the global temperature changing from 1965-2020.
+          
+        </p>
+      </div>
+    
+    </div>
     <!--<button id="play-button">Play</button>--> 
-    <br><br>
     <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
     <br><br>
     <!-- Slider Timeline -->
@@ -416,7 +423,7 @@ queue()
     .defer(d3.csv, "us_disaster_declarations.csv") // process
     .defer(d3.csv, "us_cities.csv") // https://simplemaps.com/data/us-cities
     .defer(d3.csv, "us_state_latlong.csv") //https://www.kaggle.com/washimahmed/usa-latlong-for-state-abbreviations
-    .defer(d3.csv, "global_temp.csv") //https://www.ncdc.noaa.gov/cag/global/time-series/globe/land/ann/2/1953-2021
+    //.defer(d3.csv, "global_temp.csv") //https://www.ncdc.noaa.gov/cag/global/time-series/globe/land/ann/2/1953-2021
     .await(loaded);
 
 function getCheckedCounts(year, state) {
@@ -628,7 +635,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
 //               .domain([0, 200, 763])
 //               .range(range);
     
-//     svg.append("g")
+//     svg2.append("g")
 //         .attr("class", "quantize")
 //         .attr("transform", "translate(800,50)");
     
@@ -785,26 +792,59 @@ function showModal(d) {
   }
 }
 
-///////////////////////////////////////////////////////////////////////////
-//////////////////////////// Create scales ////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
+
+var margin = {
+    top: 70,
+    right: 20,
+    bottom: 120,
+    left: 20
+};
+var width = window.innerWidth - margin.left - margin.right - 20;
+var height = window.innerHeight - margin.top - margin.bottom - 20;
+
+var domLow = -1.5,  //-15, low end of data
+    domHigh = 1.25,  //30, high end of data
+    axisTicks = [-1, 0, 1],   //[-20,-10,0,10,20,30];  [-2,-1,0,1,2,3];  [-1.5,-0.5,0.5,1.5];
+    duration = 25000; //100000, 50000
 
 
+//SVG container
+var svg1 = d3.select("#weatherRadial")
+    .append("svg1")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + (margin.left + width/2) + "," + (margin.top + height/2) + ")");
+
+//Parses a string into a date
+var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+///////////////////////////////////////////////////
 //Loads data, everything below is within callback: 
-// 
-d3.csv('global_temp.csv', function(err, data) {
-  
+///////////////////////////////////////////////////
+// d3.csv("global_temp.csv", function (d) {
+//   var temp = d[0];
+//     //console.log(temp[0].split('/'));
+//     years.push(temp[0].split('/')[0]);      
+//   return d;
+//         }, (d) => {
+//             d.forEach((e) => {
+//                 console.log(e)
+//             })
+      
+
+d3.csv("global_temp.csv", function(d) {  
+
 var years = [];
-var temp = data.map(function(d) { return d.value })
 
-console.log(temp);
-
-// var climateData = d3.csv.parseRows(text, function(d) {
-//     years.push(temp[0].split('/')[0]);
-//     return {date: parseDate(temp[0].replace('/', '-') + '-1'), mean_temp: +temp[1]}  //'-') + '-01'
-// });
+var climateData = d3.csv.parseRows(text, function(d) {
+    var temp = d[0];
+    //console.log(temp[0].split('/'));
+    years.push(temp[0].split('/')[0]);
+    return {date: parseDate(temp[0].replace('/', '-') + '-1'), mean_temp: +temp[1]}  //'-') + '-01'
+});
 //var data = d3.csv.parseRows(text);
-
+console.log(climateData);
 
 
 //Set the minimum inner radius and max outer radius of the chart
@@ -830,7 +870,6 @@ var distScale = d3.scale.linear()
 
 //Function to convert date into radians for path function
 //The radial scale in this case starts with 0 at 90 degrees
-//http://stackoverflow.com/questions/14404345/polar-plots-using-d3-js
 var radian = d3.scale.linear()
     .range([0, Math.PI*2*(climateData.length/12) ])  
     .domain(d3.extent(climateData, function(d) { return d.date; }));
@@ -840,7 +879,7 @@ var radian = d3.scale.linear()
 //////////////////////////// Create Titles ////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-var textWrapper = svg.append("g").attr("class", "textWrapper")
+var textWrapper = svg1.append("g").attr("class", "textWrapper")
     .attr("transform", "translate(" + Math.max(-width/2, -outerRadius - 170) + "," + 0 + ")");
 
 //Append title to the top
@@ -855,7 +894,7 @@ textWrapper.append("text")
     .attr("class", "subtitle")
     .attr("x", 0)
     .attr("y", -outerRadius - 20)
-    .text('January 1850 - August 2016');
+    .text('1953 - 2021');
 
 //Append play button
 var play = textWrapper.append("text")
@@ -871,7 +910,7 @@ var play = textWrapper.append("text")
 ///////////////////////////////////////////////////////////////////////////
 
 //Wrapper for the bars and to position it downward
-var barWrapper = svg.append("g")
+var barWrapper = svg1.append("g")
     .attr("transform", "translate(" + 0 + "," + 0 + ")");
     
 //Draw gridlines below the bars
@@ -910,7 +949,7 @@ barWrapper.append("text")
     .attr("x", -22)
     .attr("y", 0)
     //.attr("dy", "0.9em")
-    .text("1850");
+    .text("1953");
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////// Create radial gradient for the line //////////////////////
@@ -932,7 +971,7 @@ for(var i = 0; i < numStops; i++) {
 }
 
 //Create the radial gradient
-var radialGradient = svg.append("defs")
+var radialGradient = svg1.append("defs")
     .append("radialGradient")
     .attr("id", "radial-gradient")
     .selectAll("stop") 
@@ -949,9 +988,7 @@ var radialGradient = svg.append("defs")
 
 
 //Radial line, takes radians as argument
-//http://stackoverflow.com/questions/18487780/how-to-make-a-radial-line-segment-using-d3-js
-//http://stackoverflow.com/questions/14404345/polar-plots-using-d3-js
-var line = d3.svg.line.radial()
+var line = d3.svg1.line.radial()
     .angle(function(d) { return radian(d.date); })  
     .radius(function(d) { return distScale(d.mean_temp); });
 
@@ -1008,7 +1045,7 @@ for(var i = 0; i < numStops; i++) {
 }//for i
 
 //Create the gradient
-svg.append("defs")
+svg1.append("defs")
     .append("linearGradient")
     .attr("id", "legend-weather")
     .attr("x1", "0%").attr("y1", "0%")
@@ -1019,19 +1056,19 @@ svg.append("defs")
     .attr("offset", function(d,i) { return tempScale( tempPoint[i] )/width; })   
     .attr("stop-color", function(d,i) { return colorScale( tempPoint[i] ); });
 
-///////////////////////////////////////////////////////////////////////////
-////////////////////////// Draw the legend ////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////
+// ////////////////////////// Draw the legend ////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////
 
-var legendWidth = Math.min(outerRadius*2, 400);
+// var legendWidth = Math.min(outerRadius*2, 400);
 
 //Color Legend container
-var legendsvg = svg.append("g")
+var legendsvg1 = svg1.append("g")
     .attr("class", "legendWrapper")
     .attr("transform", "translate(" + 0 + "," + (outerRadius + 70) + ")");
 
 //Draw the Rectangle
-legendsvg.append("rect")
+legendsvg1.append("rect")
     .attr("class", "legendRect")
     .attr("x", -legendWidth/2)
     .attr("y", 0)
@@ -1041,7 +1078,7 @@ legendsvg.append("rect")
     .style("fill", "url(#legend-weather)");
     
 //Append title
-legendsvg.append("text")
+legendsvg1.append("text")
     .attr("class", "legendTitle")
     .attr("x", 0)
     .attr("y", -10)
@@ -1054,14 +1091,14 @@ var xScale = d3.scale.linear()
     .domain([domLow, domHigh] );
 
 //Define x-axis
-var xAxis = d3.svg.axis()
+var xAxis = d3.svg1.axis()
     .orient("bottom")
     .ticks(5)
     .tickFormat(function(d) { return d + "°C"; })
     .scale(xScale);
 
 //Set up X axis
-legendsvg.append("g")
+legendsvg1.append("g")
     .attr("class", "axis")
     .attr("transform", "translate(0," + (10) + ")")
     .call(xAxis);
