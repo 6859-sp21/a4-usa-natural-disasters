@@ -52,15 +52,17 @@ a:hover{
 
 <body>
     <!-- GLOBAL TEMPERATURE -->
-  <div id="weatherRadial"></div> 
-
+  <!--<div id="weatherRadial"></div> -->
+    
+    <h1>The Impact of Climate Change on Natural Disasters</h1>
     <h2 id="year_box">Year: <span id="year-value"></span></h2>
+    
     <div id="vis"></div>
     <div id="sidebar">
       <div id="legend">
         <!-- LEGEND/ LEGEND CONTENT -->
         <div id="legend-content">
-          <h4> Disaster Count (All Types): </h4>
+          <h4> Disaster Count: </h4>
           <div class= "line"> 
             <div class="av" id= "pop_0">◼︎</div>
             <div class="caption">0&nbsp;-&nbsp;190</div>
@@ -108,6 +110,7 @@ a:hover{
             </div> -->
             <div id="other">
               <input type="checkbox" name="other" value="other" class="checkbox" id="checkbox4" onclick="myFn()" checked>
+              <div class="color_box" id= "pop_other">●</div>
               <label for="other">Other</label>
             </div>
           </div>
@@ -117,9 +120,6 @@ a:hover{
     </div>
     <!-- TITLE BOX -->
     <div id="titlebox" style="display:block"> 
-      <div id="titlebox-header">
-        <h3>Consequences of Climate Change</h3>
-      </div>
       <div id="titlebox-content">
         <p>
           The visualization you see here is a model of the natural disasters occurring
@@ -127,16 +127,16 @@ a:hover{
           warming becomes more of a reality day-by-day, our team wanted to create a tool for 
           users to explore the long-term effects of humanity's impact on our environment.
           Each state is colored based on the disaster count color spectrum on the right.
-          
         </p>
       </div>
     
     </div>
     <!--<button id="play-button">Play</button>--> 
+    <div id="slider7"><img src="line1.png" /></div>
     <div id="slider6" style="text-align:center" class="d3-slider d3-slider-horizontal"></div>
-    <br><br>
+    <br>
     <!-- Slider Timeline -->
-    <p id = "datacite">Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>. This data is from 1965 - 2020.</p>
+    <p id = "datacite">Source: <a href="https://www.kaggle.com/headsortails/us-natural-disaster-declarations">Federal Emergency Management Agency</a>.</p>
     <p id = "datacite">Created by: Helen Li, Kalyn Bowen and Yuji Chan.</p>
 
     <!-- MODAL STARTS HERE-->
@@ -418,7 +418,7 @@ var projection = d3.geo.albersUsa()
 var path = d3.geo.path()
     .projection(projection);
 
-var colorScale = d3.scale.linear().range(["#fff7ec", "#7f0000"]).interpolate(d3.interpolateLab);
+var colorScale = d3.scale.linear().range(["#ffffff", "#7f0000"]).interpolate(d3.interpolateLab);
 
 var countryById = d3.map();
 var countryById2 = d3.map();

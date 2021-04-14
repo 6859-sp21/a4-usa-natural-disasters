@@ -5,12 +5,6 @@ body {
 h1 {
   text-align: center;
   color: #f8f8ff;
-  font-family: Georgia,Cambria,"Times New Roman",Times,serif;
-  font-style: normal; 
-  font-variant: normal; 
-  font-weight: 400;
-  line-height: 26.4px;
-  font-size: 30px;
 }
 
 h2 {
@@ -21,10 +15,8 @@ h2 {
   font-variant: normal; 
   font-weight: 600;
   line-height: 26.4px;
-  font-size: 30px;
   margin: 0px;
 }
-
 
 #vis {
   margin: auto;
@@ -97,14 +89,20 @@ svg{
 #slider6{
   display: flex;
   width: 880px;
-  margin: 20px auto 0px auto;
+  margin: 0px auto;
+}
+
+#slider7{
+  display: flex;
+  width: 880px;
+  margin: 0px auto;
 }
 
 /* SIDEBAR */
 #sidebar {
   position: absolute;
   z-index: 1012022;
-  top: 20px;
+  top: 100px;
   right: 10px;
   width: 150px;
 }
@@ -180,6 +178,10 @@ svg{
   color: #C48481;
 }
 
+#pop_other {
+  color: rgb(128,128,128);
+}
+
 /* DATA CITING SECTION */
 #datacite {
   text-align: center;
@@ -189,7 +191,7 @@ svg{
 #titlebox {
   position: absolute;
   z-index: 1012022;
-  top: 20px;
+  top: 100px;
   left: 10px;
   width: 275px;
   height: 350px;
