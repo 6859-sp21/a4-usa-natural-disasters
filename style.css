@@ -22,12 +22,16 @@ h2 {
   font-weight: 600;
   line-height: 26.4px;
   font-size: 30px;
-  margin: 20px, auto, 0px, auto;
+  margin: 0px;
 }
 
 
+#vis {
+  margin: auto;
+}
 h4 {
   color: #f8f8ff;
+  margin-bottom: 4px;
 }
 
 p{
@@ -111,6 +115,16 @@ svg{
   width: 16px;
   height: 16px;
   margin-right: 8px;
+  font-size: 14px;
+}
+
+.color_box {
+  margin-right: 2px;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  font-size: 20px;
+
 }
 
 .caption {
@@ -154,6 +168,18 @@ svg{
   color: #800002;
 }
 
+#pop_water {
+  color: #7C7CC2;
+}
+
+#pop_earth {
+  color: #89A969;
+}
+
+#pop_fire {
+  color: #C48481;
+}
+
 /* DATA CITING SECTION */
 #datacite {
   text-align: center;
@@ -166,10 +192,10 @@ svg{
   top: 20px;
   left: 10px;
   width: 275px;
-  height: 300px;
+  height: 350px;
   background: rgba(12, 12, 12, 0.8);
   color: #eee;
-  /* padding: 10px; */
+  padding: 5px;
   display: block;
 }
 

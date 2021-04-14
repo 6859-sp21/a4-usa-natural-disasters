@@ -54,15 +54,15 @@ a:hover{
     <!-- GLOBAL TEMPERATURE -->
   <div id="weatherRadial"></div> 
 
-    <h2>Year: <span id="year-value"></span></h2>
+    <h2 id="year_box">Year: <span id="year-value"></span></h2>
     <div id="vis"></div>
     <div id="sidebar">
       <div id="legend">
         <!-- LEGEND/ LEGEND CONTENT -->
         <div id="legend-content">
-          <h4> Disaster Count (All Types)): </h4>
+          <h4> Disaster Count (All Types): </h4>
           <div class= "line"> 
-            <div class="av" id= "pop>0">◼︎</div>
+            <div class="av" id= "pop_0">◼︎</div>
             <div class="caption">0&nbsp;-&nbsp;190</div>
           </div>
           <div class= "line"> 
@@ -85,18 +85,21 @@ a:hover{
 
         <!-- DISASTER TYPE FILTER -->
         <div class="checkbox-filters">
-          <h4>Disaster Type (For Dots):</h4>
+          <h4>Disaster Type:</h4>
           <div class="checkboxes">
             <div id="water">
               <input type="checkbox" name="water" value="water" class="checkbox" id="checkbox1" onclick="myFn()" checked>
+              <div class="color_box" id= "pop_water">●</div>
               <label for="water">Water</label>
             </div>
             <div id="earth">
               <input type="checkbox" name="earth" value="earth" class="checkbox" id="checkbox2" onclick="myFn()" checked>
+              <div class="color_box" id= "pop_earth">●</div>
               <label for="earth">Earth</label>
             </div>
             <div id="fire">
               <input type="checkbox" name="fire" value="fire" class="checkbox" id="checkbox3" onclick="myFn()" checked>
+              <div class="color_box" id= "pop_fire">●</div>
               <label for="fire">Fire</label>
             </div>
             <!-- <div id="wind">
@@ -120,7 +123,10 @@ a:hover{
       <div id="titlebox-content">
         <p>
           The visualization you see here is a model of the natural disasters occurring
-          in the United States and the global temperature changing from 1965-2020.
+          in the United States and the global temperature changing from 1965-2020. As global
+          warming becomes more of a reality day-by-day, our team wanted to create a tool for 
+          users to explore the long-term effects of humanity's impact on our environment.
+          Each state is colored based on the disaster count color spectrum on the right.
           
         </p>
       </div>
