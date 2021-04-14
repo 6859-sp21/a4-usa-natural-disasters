@@ -360,8 +360,8 @@ var circleTip = d3.tip()
   .attr('class', 'd3-tip')
   .offset([-5, 0])
   .html(function(d) {
-    return d.declaration_date.substring(0, d.declaration_date.indexOf("T")) + ":<br><br>" + d.declaration_title
-    + ":<br><br>" + d.designated_area;
+    return d.declaration_date.substring(0, d.declaration_date.indexOf("T")) + "<br><br>" + d.declaration_title
+    + "<br><br>" + d.designated_area;
   })
 
 
@@ -726,9 +726,6 @@ function updateCirclePoints() {
     .style("opacity", 0.5)
     .on('mouseover', circleTip.show)
     .on('mouseout', circleTip.hide)
-    .on('click', function(d) {
-      showModal(d)
-    })
 
   updateSelection// updating the colors of the existing ones
     .attr("cx", function(d) { return d.cx })
@@ -775,7 +772,7 @@ d3.select('#year-value').text((sliderTime.value()));
 */
 
 
-function showModal(d) {
+/*function showModal(d) {
   // Show Modal
   var modal = document.getElementById("myModal");
   modal.style.display = "block";
@@ -796,7 +793,7 @@ function showModal(d) {
       modal.style.display = "none";
     }
   }
-}
+}*/
 
 // collapsible title box
 var coll = document.getElementsByClassName("collapsible");
