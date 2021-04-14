@@ -117,13 +117,16 @@ a:hover{
     </div>
     <!-- TITLE BOX -->
     <div id="titlebox" style="display:block"> 
+      <button type="button" class="collapsible">About</button>
       <div id="titlebox-content">
         <p>
           The visualization you see here is a model of the natural disasters occurring
-          in the United States and the global temperature changing from 1965-2020. As global
-          warming becomes more of a reality day-by-day, our team wanted to create a tool for 
-          users to explore the long-term effects of humanity's impact on our environment.
-          Each state is colored based on the disaster count color spectrum on the right.
+          in the United States from 1965-2020. As climate change becomes more of a reality 
+          day-by-day, our team wanted to create a tool for users to explore the long-term 
+          effects of humanity's impact on our environment. You can drag the timeline slider to
+          explore the distribution of natural disasters across the country and filter out the 
+          disaster type on the right side bar. Each state is colored based on the disaster 
+          count color spectrum on the right.
         </p>
       </div>
     
@@ -793,6 +796,22 @@ function showModal(d) {
       modal.style.display = "none";
     }
   }
+}
+
+// collapsible title box
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
 }
 
 </script>
