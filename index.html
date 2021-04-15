@@ -51,7 +51,7 @@ a:hover{
 </style>
 
 <body>
-    <h1>The Impact of Climate Change on Natural Disasters</h1>
+    <h1>The Impact of Climate Change on Natural Disasters: 1965-2020</h1>
     <h2 id="year_box">Year: <span id="year-value"></span></h2>
     
     <div id="vis"></div>
@@ -118,13 +118,13 @@ a:hover{
     <!-- TITLE BOX -->
     <div id="titlebox" style="display:block"> 
       <button type="button" class="collapsible">About</button>
-      <div id="titlebox-content">
+      <div class="titlebox-content">
         <p>
           The visualization you see here is a model of the natural disasters occurring
           in the United States from 1965-2020. As climate change becomes more of a reality 
           day-by-day, our team wanted to create a tool for users to explore the long-term 
-          effects of humanity's impact on our environment. You can drag the timeline slider to
-          explore the distribution of natural disasters across the country and filter out the 
+          effects of humanity's impact on our environment. You can drag the timeline slider at the bottom to
+          explore the distribution of natural disasters across the country by year and filter out the 
           disaster type on the right side bar. Each state is colored based on the disaster 
           count color spectrum on the right.
         </p>
@@ -867,6 +867,7 @@ for (i = 0; i < coll.length; i++) {
       content.style.display = "block";
     }
   });
+  coll[i].click(); 
 }
 
 </script>

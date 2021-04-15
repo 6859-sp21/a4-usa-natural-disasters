@@ -208,11 +208,13 @@ p {
   margin-inline-end: 0px;
 }
 
-#titlebox-content {
+
+
+.titlebox-content {
   font-size: 12px;
   line-height: 16px;
   padding: 0 18px;
-  display: none;
+  display: block;
   overflow: hidden;
   background: rgba(12, 12, 12, 0.8);
 }
