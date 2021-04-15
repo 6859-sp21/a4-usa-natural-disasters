@@ -721,7 +721,7 @@ function loaded(error, usa, mortality, usa_cities, usa_states) {
       .orient('horizontal')
       .scale(linear);
 
-    //svg.select(".legendLinear")
+    // svg.select(".legendLinear")
     //  .call(legendLinear);
 
     // getDisasterData() // showing the brush timeline
@@ -786,11 +786,18 @@ function updateCirclePoints() {
     .on('mouseout', circleTip.hide)
 
   updateSelection// updating the colors of the existing ones
+    .attr("id", function (d) { return incident_type_to_generic_type[d.incident_type]})
     .attr("cx", function(d) { return d.cx })
     .attr("cy", function(d) { return d.cy })
+    .attr("r", function(d) {
+      return 5 / sizes[abbr_to_name[d.state]]
+    })	
     .style("fill", function(d) {
       return incident_to_color[incident_type_to_generic_type[d.incident_type]]
     })	
+    .style("opacity", 0.5)
+    .on('mouseover', circleTip.show)
+    .on('mouseout', circleTip.hide)
 }
 
 var myFn = function(slider) {
